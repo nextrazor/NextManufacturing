@@ -1,6 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NextManufacturing", "NextManufacturing\NextManufacturing.csproj", "{9CE3F83E-165C-4B54-A621-193951239298}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextManufacturing", "NextManufacturing\NextManufacturing.csproj", "{9CE3F83E-165C-4B54-A621-193951239298}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NextBackend", "NextBackend\NextBackend.csproj", "{AC3E32EA-37AE-4ACE-8EA9-AC0BC91F5034}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +17,15 @@ Global
 		{9CE3F83E-165C-4B54-A621-193951239298}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CE3F83E-165C-4B54-A621-193951239298}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9CE3F83E-165C-4B54-A621-193951239298}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC3E32EA-37AE-4ACE-8EA9-AC0BC91F5034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC3E32EA-37AE-4ACE-8EA9-AC0BC91F5034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC3E32EA-37AE-4ACE-8EA9-AC0BC91F5034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC3E32EA-37AE-4ACE-8EA9-AC0BC91F5034}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1E775829-732D-469B-99E0-CEEA50C32C40}
 	EndGlobalSection
 EndGlobal
