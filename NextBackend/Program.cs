@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Extensions.Localization;
+using NextBackend.Controllers;
 using NextBackend.DAL;
 
 namespace NextBackend
@@ -12,7 +13,7 @@ namespace NextBackend
 
             // Add services to the container.
 
-            builder.Services.AddLocalization();
+            builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
             builder.Services.AddDbContext<NmaContext>();
 
             builder.Services.AddControllers();
@@ -30,6 +31,12 @@ namespace NextBackend
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            var supportedCultures = new[] { "en", "ru" };
+            var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0])
+                .AddSupportedCultures(supportedCultures)
+                .AddSupportedUICultures(supportedCultures);
+            app.UseRequestLocalization(localizationOptions);
 
             app.UseExceptionHandler(a => a.Run(async context =>
             {

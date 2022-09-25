@@ -57,7 +57,7 @@ namespace NextBackend.Controllers
             if (name == string.Empty)
                 throw new ArgumentException("Empty name", nameof(name));
             if (periodDuration <= 0)
-                throw new ArgumentException("Negative period duration", nameof(periodDuration));
+                throw new ArgumentException("Negative or zero period duration", nameof(periodDuration));
             TimeSpan pd = TimeSpan.FromDays(periodDuration);
             var calendarTemplate = _dbContext.CalendarTemplates.FirstOrDefault(ct => ct.Guid == guid) ??
                 throw new ArgumentException("Record not found", nameof(guid));
