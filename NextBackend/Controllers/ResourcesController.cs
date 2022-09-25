@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using NextBackend.DAL;
 
 namespace NextBackend.Controllers
@@ -7,11 +8,19 @@ namespace NextBackend.Controllers
     [Route("[controller]")]
     public class ResourcesController : ControllerBase
     {
+        private readonly NmaContext _dbContext;
+        private readonly IStringLocalizer<ResourcesController> _localizer;
+
+        public ResourcesController(NmaContext dbContext, IStringLocalizer<ResourcesController> localizer)
+        {
+            _dbContext = dbContext;
+            _localizer = localizer;
+        }
+
         [HttpGet]
         public IEnumerable<Resource> Read()
         {
-            using var dbContext = new NmaContext();
-            return dbContext.Resources.ToList();
+            return _dbContext.Resources.ToList();
         }
 
         [HttpPost]
@@ -21,16 +30,15 @@ namespace NextBackend.Controllers
             name = name.Trim();
             if (name == string.Empty)
                 throw new ArgumentException("Empty name", nameof(name));
-            using var dbContext = new NmaContext();
-            if (dbContext.Resources.Any(r => r.Name == name))
+            if (_dbContext.Resources.Any(r => r.Name == name))
                 throw new ArgumentException("Duplicate name", nameof(name));
             var resource = new Resource()
             {
                 Guid = Guid.NewGuid(),
                 Name = name
             };
-            dbContext.Resources.Add(resource);
-            await dbContext.SaveChangesAsync();
+            _dbContext.Resources.Add(resource);
+            await _dbContext.SaveChangesAsync();
             return resource;
         }
 
@@ -38,12 +46,11 @@ namespace NextBackend.Controllers
         [Route("DeleteResource/{guid:guid}")]
         public async Task<bool> Delete(Guid guid)
         {
-            using var dbContext = new NmaContext();
-            var resource = dbContext.Resources.FirstOrDefault(r => r.Guid == guid);
+            var resource = _dbContext.Resources.FirstOrDefault(r => r.Guid == guid);
             if (resource == null)
                 return false;
-            dbContext.Resources.Remove(resource);
-            await dbContext.SaveChangesAsync();
+            _dbContext.Resources.Remove(resource);
+            await _dbContext.SaveChangesAsync();
             return true;
         }
     }

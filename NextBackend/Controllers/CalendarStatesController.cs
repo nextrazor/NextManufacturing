@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using NextBackend.DAL;
 
 namespace NextBackend.Controllers
@@ -7,11 +8,19 @@ namespace NextBackend.Controllers
     [Route("[controller]")]
     public class CalendarStatesController : ControllerBase
     {
+        private readonly NmaContext _dbContext;
+        private readonly IStringLocalizer<CalendarStatesController> _localizer;
+
+        public CalendarStatesController(NmaContext dbContext, IStringLocalizer<CalendarStatesController> localizer)
+        {
+            _dbContext = dbContext;
+            _localizer = localizer;
+        }
+
         [HttpGet]
         public IEnumerable<CalendarState> Read()
         {
-            using var dbContext = new NmaContext();
-            return dbContext.CalendarStates.ToList();
+            return _dbContext.CalendarStates.ToList();
         }
 
         [HttpPost]
@@ -21,16 +30,15 @@ namespace NextBackend.Controllers
             name = name.Trim();
             if (name == string.Empty)
                 throw new ArgumentException("Empty name", nameof(name));
-            using var dbContext = new NmaContext();
-            if (dbContext.CalendarStates.Any(cs => cs.Name == name))
+            if (_dbContext.CalendarStates.Any(cs => cs.Name == name))
                 throw new ArgumentException("Duplicate name", nameof(name));
             var calendarState = new CalendarState()
             {
                 Guid = Guid.NewGuid(),
                 Name = name
             };
-            dbContext.CalendarStates.Add(calendarState);
-            await dbContext.SaveChangesAsync();
+            _dbContext.CalendarStates.Add(calendarState);
+            await _dbContext.SaveChangesAsync();
             return calendarState;
         }
 
@@ -38,12 +46,11 @@ namespace NextBackend.Controllers
         [Route("DeleteCalendarState/{guid:guid}")]
         public async Task<bool> Delete(Guid guid)
         {
-            using var dbContext = new NmaContext();
-            var calendarState = dbContext.CalendarStates.FirstOrDefault(cs => cs.Guid == guid);
+            var calendarState = _dbContext.CalendarStates.FirstOrDefault(cs => cs.Guid == guid);
             if (calendarState == null)
                 return false;
-            dbContext.CalendarStates.Remove(calendarState);
-            await dbContext.SaveChangesAsync();
+            _dbContext.CalendarStates.Remove(calendarState);
+            await _dbContext.SaveChangesAsync();
             return true;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using NextBackend.DAL;
 
 namespace NextBackend.Controllers
@@ -7,11 +8,19 @@ namespace NextBackend.Controllers
     [Route("[controller]")]
     public class CalendarTemplateSpansController : Controller
     {
+        private readonly NmaContext _dbContext;
+        private readonly IStringLocalizer<CalendarTemplateSpansController> _localizer;
+
+        public CalendarTemplateSpansController(NmaContext dbContext, IStringLocalizer<CalendarTemplateSpansController> localizer)
+        {
+            _dbContext = dbContext;
+            _localizer = localizer;
+        }
+
         [HttpGet]
         public IEnumerable<CalendarTemplateSpan> Read()
         {
-            using var dbContext = new NmaContext();
-            return dbContext.CalendarTemplateSpans.ToList();
+            return _dbContext.CalendarTemplateSpans.ToList();
         }
 
         [HttpPost]
@@ -24,14 +33,13 @@ namespace NextBackend.Controllers
                 throw new ArgumentException("End time too early", nameof(toTime));
             TimeSpan ft = TimeSpan.FromDays(fromTime);
             TimeSpan tt = TimeSpan.FromDays(toTime);
-            using var dbContext = new NmaContext();
-            CalendarTemplate calendarTemplate = dbContext.CalendarTemplates.FirstOrDefault(ct => ct.Guid == calendarTemplateGuid) ??
+            CalendarTemplate calendarTemplate = _dbContext.CalendarTemplates.FirstOrDefault(ct => ct.Guid == calendarTemplateGuid) ??
                 throw new ArgumentException("Illegal calendar template", nameof(calendarTemplateGuid));
-            if (!dbContext.CalendarStates.Any(cs => cs.Guid == stateGuid))
+            if (!_dbContext.CalendarStates.Any(cs => cs.Guid == stateGuid))
                 throw new ArgumentException("Illegal calendar state", nameof(stateGuid));
             if (tt > calendarTemplate.PeriodDuration)
                 throw new ArgumentException("End time is bigger that template period", nameof(toTime));
-            if (dbContext.CalendarTemplateSpans.Any(cts => (cts.CalendarTemplateGuid == calendarTemplateGuid) &&
+            if (_dbContext.CalendarTemplateSpans.Any(cts => (cts.CalendarTemplateGuid == calendarTemplateGuid) &&
                 (cts.FromTime < tt) && (cts.ToTime > ft)))
                 throw new ArgumentException("There is an overlapped span in this template", nameof(fromTime));
             var calendarTemplateSpan = new CalendarTemplateSpan()
@@ -42,8 +50,8 @@ namespace NextBackend.Controllers
                 FromTime = ft,
                 ToTime = tt
             };
-            dbContext.CalendarTemplateSpans.Add(calendarTemplateSpan);
-            await dbContext.SaveChangesAsync();
+            _dbContext.CalendarTemplateSpans.Add(calendarTemplateSpan);
+            await _dbContext.SaveChangesAsync();
             return calendarTemplateSpan;
         }
 
@@ -57,20 +65,19 @@ namespace NextBackend.Controllers
                 throw new ArgumentException("End time too early", nameof(toTime));
             TimeSpan ft = TimeSpan.FromDays(fromTime);
             TimeSpan tt = TimeSpan.FromDays(toTime);
-            using var dbContext = new NmaContext();
-            var calendarTemplateSpan = dbContext.CalendarTemplateSpans.FirstOrDefault(cts => cts.Guid == guid) ??
+            var calendarTemplateSpan = _dbContext.CalendarTemplateSpans.FirstOrDefault(cts => cts.Guid == guid) ??
                 throw new ArgumentException("Record not found", nameof(guid));
-            if (!dbContext.CalendarStates.Any(cs => cs.Guid == stateGuid))
+            if (!_dbContext.CalendarStates.Any(cs => cs.Guid == stateGuid))
                 throw new ArgumentException("Illegal calendar state", nameof(stateGuid));
             if (tt > calendarTemplateSpan.CalendarTemplate.PeriodDuration)
                 throw new ArgumentException("End time is bigger that template period", nameof(toTime));
-            if (dbContext.CalendarTemplateSpans.Any(cts => (cts.CalendarTemplateGuid == calendarTemplateSpan.CalendarTemplateGuid) &&
+            if (_dbContext.CalendarTemplateSpans.Any(cts => (cts.CalendarTemplateGuid == calendarTemplateSpan.CalendarTemplateGuid) &&
                 (cts.Guid != guid) && (cts.FromTime < tt) && (cts.ToTime > ft)))
                 throw new ArgumentException("There is an overlapped span in this template", nameof(fromTime));
             calendarTemplateSpan.StateGuid = stateGuid;
             calendarTemplateSpan.FromTime = ft;
             calendarTemplateSpan.ToTime = tt;
-            await dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             return calendarTemplateSpan;
         }
 
@@ -78,12 +85,11 @@ namespace NextBackend.Controllers
         [Route("DeleteCalendarTemplateSpan/{guid:guid}")]
         public async Task<bool> Delete(Guid guid)
         {
-            using var dbContext = new NmaContext();
-            var calendarTemplateSpan = dbContext.CalendarTemplateSpans.FirstOrDefault(cts => cts.Guid == guid);
+            var calendarTemplateSpan = _dbContext.CalendarTemplateSpans.FirstOrDefault(cts => cts.Guid == guid);
             if (calendarTemplateSpan == null)
                 return false;
-            dbContext.CalendarTemplateSpans.Remove(calendarTemplateSpan);
-            await dbContext.SaveChangesAsync();
+            _dbContext.CalendarTemplateSpans.Remove(calendarTemplateSpan);
+            await _dbContext.SaveChangesAsync();
             return true;
         }
     }

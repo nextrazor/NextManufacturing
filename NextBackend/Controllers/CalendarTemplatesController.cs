@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using NextBackend.DAL;
 
 namespace NextBackend.Controllers
@@ -7,11 +8,19 @@ namespace NextBackend.Controllers
     [Route("[controller]")]
     public class CalendarTemplatesController : ControllerBase
     {
+        private readonly NmaContext _dbContext;
+        private readonly IStringLocalizer<CalendarTemplatesController> _localizer;
+
+        public CalendarTemplatesController(NmaContext dbContext, IStringLocalizer<CalendarTemplatesController> localizer)
+        {
+            _dbContext = dbContext;
+            _localizer = localizer;
+        }
+
         [HttpGet]
         public IEnumerable<CalendarTemplate> Read()
         {
-            using var dbContext = new NmaContext();
-            return dbContext.CalendarTemplates.ToList();
+            return _dbContext.CalendarTemplates.ToList();
         }
 
         [HttpPost]
@@ -23,10 +32,9 @@ namespace NextBackend.Controllers
                 throw new ArgumentException("Empty name", nameof(name));
             if (periodDuration <= 0)
                 throw new ArgumentException("Negative or zero period duration", nameof(periodDuration));
-            using var dbContext = new NmaContext();
-            if (dbContext.CalendarTemplates.Any(ct => ct.Name == name))
+            if (_dbContext.CalendarTemplates.Any(ct => ct.Name == name))
                 throw new ArgumentException("Duplicate name", nameof(name));
-            if (!dbContext.CalendarStates.Any(cs => cs.Guid == defaultStateGuid))
+            if (!_dbContext.CalendarStates.Any(cs => cs.Guid == defaultStateGuid))
                 throw new ArgumentException("Illegal default state", nameof(defaultStateGuid));
             var calendarTemplate = new CalendarTemplate()
             {
@@ -36,8 +44,8 @@ namespace NextBackend.Controllers
                 PeriodDuration = TimeSpan.FromDays(periodDuration),
                 ReferenceDate = referenceDate
             };
-            dbContext.CalendarTemplates.Add(calendarTemplate);
-            await dbContext.SaveChangesAsync();
+            _dbContext.CalendarTemplates.Add(calendarTemplate);
+            await _dbContext.SaveChangesAsync();
             return calendarTemplate;
         }
 
@@ -51,18 +59,17 @@ namespace NextBackend.Controllers
             if (periodDuration <= 0)
                 throw new ArgumentException("Negative period duration", nameof(periodDuration));
             TimeSpan pd = TimeSpan.FromDays(periodDuration);
-            using var dbContext = new NmaContext();
-            var calendarTemplate = dbContext.CalendarTemplates.FirstOrDefault(ct => ct.Guid == guid) ??
+            var calendarTemplate = _dbContext.CalendarTemplates.FirstOrDefault(ct => ct.Guid == guid) ??
                 throw new ArgumentException("Record not found", nameof(guid));
-            if (!dbContext.CalendarStates.Any(cs => cs.Guid == defaultStateGuid))
+            if (!_dbContext.CalendarStates.Any(cs => cs.Guid == defaultStateGuid))
                 throw new ArgumentException("Illegal default state", nameof(defaultStateGuid));
-            if (dbContext.CalendarTemplateSpans.Any(cts => (cts.CalendarTemplateGuid == guid) && (cts.ToTime > pd)))
+            if (_dbContext.CalendarTemplateSpans.Any(cts => (cts.CalendarTemplateGuid == guid) && (cts.ToTime > pd)))
                 throw new ArgumentException("There are calendar spans later that a new period duration", nameof(periodDuration));
             calendarTemplate.Name = name;
             calendarTemplate.DefaultStateGuid = defaultStateGuid;
             calendarTemplate.PeriodDuration = pd;
             calendarTemplate.ReferenceDate = referenceDate;
-            await dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             return calendarTemplate;
         }
 
@@ -70,12 +77,11 @@ namespace NextBackend.Controllers
         [Route("DeleteCalendarTemplate/{guid:guid}")]
         public async Task<bool> Delete(Guid guid)
         {
-            using var dbContext = new NmaContext();
-            var calendarTemplate = dbContext.CalendarTemplates.FirstOrDefault(ct => ct.Guid == guid);
+            var calendarTemplate = _dbContext.CalendarTemplates.FirstOrDefault(ct => ct.Guid == guid);
             if (calendarTemplate == null)
                 return false;
-            dbContext.CalendarTemplates.Remove(calendarTemplate);
-            await dbContext.SaveChangesAsync();
+            _dbContext.CalendarTemplates.Remove(calendarTemplate);
+            await _dbContext.SaveChangesAsync();
             return true;
         }
     }

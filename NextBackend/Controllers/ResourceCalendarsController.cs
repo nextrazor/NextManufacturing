@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using NextBackend.DAL;
 
 namespace NextBackend.Controllers
@@ -7,23 +8,30 @@ namespace NextBackend.Controllers
     [Route("[controller]")]
     public class ResourceCalendarsController : Controller
     {
+        private readonly NmaContext _dbContext;
+        private readonly IStringLocalizer<ResourceCalendarsController> _localizer;
+
+        public ResourceCalendarsController(NmaContext dbContext, IStringLocalizer<ResourceCalendarsController> localizer)
+        {
+            _dbContext = dbContext;
+            _localizer = localizer;
+        }
+
         [HttpGet]
         public IEnumerable<ResourceCalendar> Read()
         {
-            using var dbContext = new NmaContext();
-            return dbContext.ResourceCalendars.ToList();
+            return _dbContext.ResourceCalendars.ToList();
         }
 
         [HttpPost]
         [Route("CreateResourceCalendar/{resourceGuid:guid}/{calendarTemplateGuid:guid}/{fromTime:datetime}")]
         public async Task<ResourceCalendar> Create(Guid resourceGuid, Guid calendarTemplateGuid, DateTime fromTime)
         {
-            using var dbContext = new NmaContext();
-            if (!dbContext.Resources.Any(res => res.Guid == resourceGuid))
+            if (!_dbContext.Resources.Any(res => res.Guid == resourceGuid))
                 throw new ArgumentException("Illegal resource", nameof(resourceGuid));
-            if (!dbContext.CalendarTemplates.Any(ct => ct.Guid == calendarTemplateGuid))
+            if (!_dbContext.CalendarTemplates.Any(ct => ct.Guid == calendarTemplateGuid))
                 throw new ArgumentException("Illegal calendar template", nameof(calendarTemplateGuid));
-            var resourceCalendar = dbContext.ResourceCalendars.FirstOrDefault(rc => (rc.ResourceGuid == resourceGuid) && (rc.FromTime == fromTime));
+            var resourceCalendar = _dbContext.ResourceCalendars.FirstOrDefault(rc => (rc.ResourceGuid == resourceGuid) && (rc.FromTime == fromTime));
             if (resourceCalendar != null)
             {
                 resourceCalendar.CalendarTemplateGuid = calendarTemplateGuid;
@@ -37,9 +45,9 @@ namespace NextBackend.Controllers
                     CalendarTemplateGuid = calendarTemplateGuid,
                     FromTime = fromTime
                 };
-                dbContext.ResourceCalendars.Add(resourceCalendar);
+                _dbContext.ResourceCalendars.Add(resourceCalendar);
             }
-            await dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             return resourceCalendar;
         }
 
@@ -47,20 +55,19 @@ namespace NextBackend.Controllers
         [Route("UpdateResourceCalendar/{guid:guid}/{calendarTemplateGuid:guid}/{fromTime:datetime}")]
         public async Task<ResourceCalendar> Update(Guid guid, Guid calendarTemplateGuid, DateTime fromTime)
         {
-            using var dbContext = new NmaContext();
-            var resourceCalendar = dbContext.ResourceCalendars.FirstOrDefault(rc => rc.Guid == guid) ??
+            var resourceCalendar = _dbContext.ResourceCalendars.FirstOrDefault(rc => rc.Guid == guid) ??
                 throw new ArgumentException("Record not found", nameof(guid));
-            if (!dbContext.CalendarTemplates.Any(ct => ct.Guid == calendarTemplateGuid))
+            if (!_dbContext.CalendarTemplates.Any(ct => ct.Guid == calendarTemplateGuid))
                 throw new ArgumentException("Illegal calendar template", nameof(calendarTemplateGuid));
-            var duplicateResourceCalendar = dbContext.ResourceCalendars
+            var duplicateResourceCalendar = _dbContext.ResourceCalendars
                 .FirstOrDefault(rc => (rc.ResourceGuid == resourceCalendar.ResourceGuid) && (rc.FromTime == fromTime));
             if (duplicateResourceCalendar != null)
             {
-                dbContext.ResourceCalendars.Remove(duplicateResourceCalendar);
+                _dbContext.ResourceCalendars.Remove(duplicateResourceCalendar);
             }
             resourceCalendar.CalendarTemplateGuid = calendarTemplateGuid;
             resourceCalendar.FromTime = fromTime;
-            await dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             return resourceCalendar;
         }
 
@@ -68,12 +75,11 @@ namespace NextBackend.Controllers
         [Route("DeleteResourceCalendar/{guid:guid}")]
         public async Task<bool> Delete(Guid guid)
         {
-            using var dbContext = new NmaContext();
-            var resourceCalendar = dbContext.ResourceCalendars.FirstOrDefault(rc => rc.Guid == guid);
+            var resourceCalendar = _dbContext.ResourceCalendars.FirstOrDefault(rc => rc.Guid == guid);
             if (resourceCalendar == null)
                 return false;
-            dbContext.ResourceCalendars.Remove(resourceCalendar);
-            await dbContext.SaveChangesAsync();
+            _dbContext.ResourceCalendars.Remove(resourceCalendar);
+            await _dbContext.SaveChangesAsync();
             return true;
         }
     }

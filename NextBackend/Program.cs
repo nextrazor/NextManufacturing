@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Extensions.Localization;
+using NextBackend.DAL;
 
 namespace NextBackend
 {
@@ -9,6 +11,9 @@ namespace NextBackend
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
+            builder.Services.AddLocalization();
+            builder.Services.AddDbContext<NmaContext>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -34,7 +39,7 @@ namespace NextBackend
                 await context.Response.WriteAsJsonAsync(new
                 {
                     error = exception.Message,
-                    stack = exception.StackTrace,
+                    stack = exception.StackTrace?.Split("\r\n"),
                     source = exception.Source,
                     data = exception.Data
                 });
