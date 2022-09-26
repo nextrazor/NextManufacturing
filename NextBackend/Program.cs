@@ -10,6 +10,20 @@ namespace NextBackend
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            
+            // Create CORS policy _myAllowSpecificOrigins
+            var  MyAllowAllOrigins = "_myAllowAllOrigins";
+            
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowAllOrigins,
+                    policy  =>
+                    {
+                        policy.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
 
             // Add services to the container.
 
@@ -24,10 +38,14 @@ namespace NextBackend
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
-
+            
+           
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                // Add MyAllowAllOrigins CORS policy to app
+                app.UseCors(MyAllowAllOrigins);
+                
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }

@@ -46,6 +46,11 @@ export const NavMenu = () => {
               icon: <DownloadOutlined />,
               label: 'Settings',
             },
+            {
+              key: '/fetch-resources',
+              icon: <DownloadOutlined />,
+              label: 'Resources',
+            },
           ]}
       />
   );

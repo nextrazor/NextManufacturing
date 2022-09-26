@@ -22,6 +22,19 @@ namespace NextBackend.Controllers
         {
             return _dbContext.Resources.ToList();
         }
+        
+        [HttpPost]
+        [Route("UpdateResource/{guid}/{name}")]
+        public async Task<bool> Create(Guid guid, string name)
+        {
+            var resource = _dbContext.Resources.FirstOrDefault(r => r.Guid == guid);
+            if (resource == null)
+                return false;
+            resource.Name = name;
+            _dbContext.Resources.Update(resource);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
 
         [HttpPost]
         [Route("CreateResource/{name}")]
