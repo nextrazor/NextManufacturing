@@ -29,9 +29,9 @@ namespace NextBackend.Controllers
         {
             name = name.Trim();
             if (name == string.Empty)
-                throw new ArgumentException("Empty name", nameof(name));
+                throw new ArgumentException(_localizer["Empty name"], nameof(name));
             if (_dbContext.CalendarStates.Any(cs => cs.Name == name))
-                throw new ArgumentException("Duplicate name", nameof(name));
+                throw new ArgumentException(_localizer["Duplicate name"], nameof(name));
             var calendarState = new CalendarState()
             {
                 Guid = Guid.NewGuid(),

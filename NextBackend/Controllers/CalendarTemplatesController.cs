@@ -29,13 +29,13 @@ namespace NextBackend.Controllers
         {
             name = name.Trim();
             if (name == string.Empty)
-                throw new ArgumentException("Empty name", nameof(name));
+                throw new ArgumentException(_localizer["Empty name"], nameof(name));
             if (periodDuration <= 0)
-                throw new ArgumentException("Negative or zero period duration", nameof(periodDuration));
+                throw new ArgumentException(_localizer["Negative or zero period duration"], nameof(periodDuration));
             if (_dbContext.CalendarTemplates.Any(ct => ct.Name == name))
-                throw new ArgumentException("Duplicate name", nameof(name));
+                throw new ArgumentException(_localizer["Duplicate name"], nameof(name));
             if (!_dbContext.CalendarStates.Any(cs => cs.Guid == defaultStateGuid))
-                throw new ArgumentException("Illegal default state", nameof(defaultStateGuid));
+                throw new ArgumentException(_localizer["Illegal default state"], nameof(defaultStateGuid));
             var calendarTemplate = new CalendarTemplate()
             {
                 Guid = Guid.NewGuid(),
@@ -55,16 +55,16 @@ namespace NextBackend.Controllers
         {
             name = name.Trim();
             if (name == string.Empty)
-                throw new ArgumentException("Empty name", nameof(name));
+                throw new ArgumentException(_localizer["Empty name"], nameof(name));
             if (periodDuration <= 0)
-                throw new ArgumentException("Negative or zero period duration", nameof(periodDuration));
+                throw new ArgumentException(_localizer["Negative or zero period duration"], nameof(periodDuration));
             TimeSpan pd = TimeSpan.FromDays(periodDuration);
             var calendarTemplate = _dbContext.CalendarTemplates.FirstOrDefault(ct => ct.Guid == guid) ??
-                throw new ArgumentException("Record not found", nameof(guid));
+                throw new ArgumentException(_localizer["Record not found"], nameof(guid));
             if (!_dbContext.CalendarStates.Any(cs => cs.Guid == defaultStateGuid))
-                throw new ArgumentException("Illegal default state", nameof(defaultStateGuid));
+                throw new ArgumentException(_localizer["Illegal default state"], nameof(defaultStateGuid));
             if (_dbContext.CalendarTemplateSpans.Any(cts => (cts.CalendarTemplateGuid == guid) && (cts.ToTime > pd)))
-                throw new ArgumentException("There are calendar spans later that a new period duration", nameof(periodDuration));
+                throw new ArgumentException(_localizer["There are calendar spans later that a new period duration"], nameof(periodDuration));
             calendarTemplate.Name = name;
             calendarTemplate.DefaultStateGuid = defaultStateGuid;
             calendarTemplate.PeriodDuration = pd;

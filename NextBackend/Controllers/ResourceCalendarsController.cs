@@ -28,9 +28,9 @@ namespace NextBackend.Controllers
         public async Task<ResourceCalendar> Create(Guid resourceGuid, Guid calendarTemplateGuid, DateTime fromTime)
         {
             if (!_dbContext.Resources.Any(res => res.Guid == resourceGuid))
-                throw new ArgumentException("Illegal resource", nameof(resourceGuid));
+                throw new ArgumentException(_localizer["Illegal resource"], nameof(resourceGuid));
             if (!_dbContext.CalendarTemplates.Any(ct => ct.Guid == calendarTemplateGuid))
-                throw new ArgumentException("Illegal calendar template", nameof(calendarTemplateGuid));
+                throw new ArgumentException(_localizer["Illegal calendar template"], nameof(calendarTemplateGuid));
             var resourceCalendar = _dbContext.ResourceCalendars.FirstOrDefault(rc => (rc.ResourceGuid == resourceGuid) && (rc.FromTime == fromTime));
             if (resourceCalendar != null)
             {
@@ -56,9 +56,9 @@ namespace NextBackend.Controllers
         public async Task<ResourceCalendar> Update(Guid guid, Guid calendarTemplateGuid, DateTime fromTime)
         {
             var resourceCalendar = _dbContext.ResourceCalendars.FirstOrDefault(rc => rc.Guid == guid) ??
-                throw new ArgumentException("Record not found", nameof(guid));
+                throw new ArgumentException(_localizer["Record not found"], nameof(guid));
             if (!_dbContext.CalendarTemplates.Any(ct => ct.Guid == calendarTemplateGuid))
-                throw new ArgumentException("Illegal calendar template", nameof(calendarTemplateGuid));
+                throw new ArgumentException(_localizer["Illegal calendar template"], nameof(calendarTemplateGuid));
             var duplicateResourceCalendar = _dbContext.ResourceCalendars
                 .FirstOrDefault(rc => (rc.ResourceGuid == resourceCalendar.ResourceGuid) && (rc.FromTime == fromTime));
             if (duplicateResourceCalendar != null)

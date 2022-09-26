@@ -28,20 +28,20 @@ namespace NextBackend.Controllers
         public async Task<CalendarTemplateSpan> Create(Guid calendarTemplateGuid, Guid stateGuid, double fromTime, double toTime)
         {
             if (fromTime < 0)
-                throw new ArgumentException("Negative start time", nameof(fromTime));
+                throw new ArgumentException(_localizer["Negative start time"], nameof(fromTime));
             if (toTime <= fromTime)
-                throw new ArgumentException("End time too early", nameof(toTime));
+                throw new ArgumentException(_localizer["End time too early"], nameof(toTime));
             TimeSpan ft = TimeSpan.FromDays(fromTime);
             TimeSpan tt = TimeSpan.FromDays(toTime);
             CalendarTemplate calendarTemplate = _dbContext.CalendarTemplates.FirstOrDefault(ct => ct.Guid == calendarTemplateGuid) ??
-                throw new ArgumentException("Illegal calendar template", nameof(calendarTemplateGuid));
+                throw new ArgumentException(_localizer["Illegal calendar template"], nameof(calendarTemplateGuid));
             if (!_dbContext.CalendarStates.Any(cs => cs.Guid == stateGuid))
-                throw new ArgumentException("Illegal calendar state", nameof(stateGuid));
+                throw new ArgumentException(_localizer["Illegal calendar state"], nameof(stateGuid));
             if (tt > calendarTemplate.PeriodDuration)
-                throw new ArgumentException("End time is bigger that template period", nameof(toTime));
+                throw new ArgumentException(_localizer["End time is bigger that template period"], nameof(toTime));
             if (_dbContext.CalendarTemplateSpans.Any(cts => (cts.CalendarTemplateGuid == calendarTemplateGuid) &&
                 (cts.FromTime < tt) && (cts.ToTime > ft)))
-                throw new ArgumentException("There is an overlapped span in this template", nameof(fromTime));
+                throw new ArgumentException(_localizer["There is an overlapped span in this template"], nameof(fromTime));
             var calendarTemplateSpan = new CalendarTemplateSpan()
             {
                 Guid = Guid.NewGuid(),
@@ -60,20 +60,20 @@ namespace NextBackend.Controllers
         public async Task<CalendarTemplateSpan> Update(Guid guid, Guid stateGuid, double fromTime, double toTime)
         {
             if (fromTime < 0)
-                throw new ArgumentException("Negative start time", nameof(fromTime));
+                throw new ArgumentException(_localizer["Negative start time"], nameof(fromTime));
             if (toTime <= fromTime)
-                throw new ArgumentException("End time too early", nameof(toTime));
+                throw new ArgumentException(_localizer["End time too early"], nameof(toTime));
             TimeSpan ft = TimeSpan.FromDays(fromTime);
             TimeSpan tt = TimeSpan.FromDays(toTime);
             var calendarTemplateSpan = _dbContext.CalendarTemplateSpans.FirstOrDefault(cts => cts.Guid == guid) ??
-                throw new ArgumentException("Record not found", nameof(guid));
+                throw new ArgumentException(_localizer["Record not found"], nameof(guid));
             if (!_dbContext.CalendarStates.Any(cs => cs.Guid == stateGuid))
-                throw new ArgumentException("Illegal calendar state", nameof(stateGuid));
+                throw new ArgumentException(_localizer["Illegal calendar state"], nameof(stateGuid));
             if (tt > calendarTemplateSpan.CalendarTemplate.PeriodDuration)
-                throw new ArgumentException("End time is bigger that template period", nameof(toTime));
+                throw new ArgumentException(_localizer["End time is bigger that template period"], nameof(toTime));
             if (_dbContext.CalendarTemplateSpans.Any(cts => (cts.CalendarTemplateGuid == calendarTemplateSpan.CalendarTemplateGuid) &&
                 (cts.Guid != guid) && (cts.FromTime < tt) && (cts.ToTime > ft)))
-                throw new ArgumentException("There is an overlapped span in this template", nameof(fromTime));
+                throw new ArgumentException(_localizer["There is an overlapped span in this template"], nameof(fromTime));
             calendarTemplateSpan.StateGuid = stateGuid;
             calendarTemplateSpan.FromTime = ft;
             calendarTemplateSpan.ToTime = tt;
