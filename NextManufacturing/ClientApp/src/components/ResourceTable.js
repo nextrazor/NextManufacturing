@@ -105,7 +105,7 @@ const ResourceTable = (originData) => {
           setEditingKey('');
         }
         
-        fetch(`https://localhost:7167/Resources/DeleteResource/${key}`,{method: 'POST'})
+        fetch(`https://localhost:7167/Resources/DeleteResource/${key}`,{method: 'DELETE'})
       } catch (errInfo) {
         console.log('Validate Failed:', errInfo);
       }
@@ -128,7 +128,7 @@ const ResourceTable = (originData) => {
         setEditingKey('');
       }
       
-      fetch(`https://localhost:7167/Resources/UpdateResource/${key}/${row.name}`,{method: 'DELETE'})
+      fetch(`https://localhost:7167/Resources/UpdateResource/${key}/${row.name}`,{method: 'POST'})
     } catch (errInfo) {
       console.log('Validate Failed:', errInfo);
     }
