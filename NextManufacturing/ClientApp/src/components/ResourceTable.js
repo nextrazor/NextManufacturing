@@ -1,4 +1,4 @@
-import { Form, Input, InputNumber, Popconfirm, Table, Typography, Modal, Button } from 'antd';
+import { Form, Input, InputNumber, Popconfirm, Table, Typography, Modal, Button, message } from 'antd';
 import React, { useState } from 'react';
 
 const EditableCell = ({
@@ -41,30 +41,45 @@ const ResourceTable = (originData) => {
   const [modalForm] = Form.useForm();
   const [data, setData] = useState(originData.originData);
   const [editingKey, setEditingKey] = useState('');
-  const [deletingKey, setDeletingKey] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  var newResourceName = '';
-  
   const isEditing = (record) => record.key === editingKey;
-  const isDeleting = (record) => record.key === deletingKey;
 
-
-    const showModal = () => {
-      setIsModalOpen(true);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  
+  const logErrorFromResponse = (response) => {
+    response.json().then(parsedResponse => {
+      console.log(parsedResponse);
+      error('Error ' + parsedResponse.error);
+    })
+  }
+  
+  const handleOk = async () => {
+    const row = await modalForm.validateFields();
+    fetch(`https://localhost:7167/Resources/CreateResource/${row.name}`,{method: 'POST'}).then(response => {
+      if (response.ok)
+        {
+        response.json().then(parsedResponse => 
+          {
+            parsedResponse.key = parsedResponse.guid;
+            const newData = [...data];
+            newData.push(parsedResponse);
+            setData(newData);
+            modalForm.resetFields();
+            setIsModalOpen(false);
+            success('Item added successfully');
+          });
+        }
+        else
+          logErrorFromResponse(response);
+      });
     };
   
-    const handleOk = async () => {
-      const row = await modalForm.validateFields();
-      fetch(`https://localhost:7167/Resources/CreateResource/${row.name}`,{method: 'POST'})
-      modalForm.resetFields();
-      setIsModalOpen(false);
-    };
-  
-    const handleCancel = async () => {
-      modalForm.resetFields();
-      setIsModalOpen(false);
-    };
+  const handleCancel = async () => {
+    modalForm.resetFields();
+    setIsModalOpen(false);
+  };
 
   const edit = (record) => {
     form.setFieldsValue({
@@ -75,38 +90,34 @@ const ResourceTable = (originData) => {
     });
     setEditingKey(record.key);
   };
-  
-  const deleteButton = (record) => {
-      setDeletingKey(record.key);
-    };
 
   const cancel = () => {
     setEditingKey('');
   };
   
-  const cancelDelete = () => {
-    setDeletingKey('');
-  };
-  
   const deleteItem = async (key) => {
       try {
-        const row = await form.validateFields();
         const newData = [...data];
         const index = newData.findIndex((item) => key === item.key);
           
         if (index > -1) {
-          const item = newData[index];
-          newData.splice(index, 1, { ...item, ...row });
-          setData(newData);
-          setEditingKey('');
+          fetch(`https://localhost:7167/Resources/DeleteResource/${key}`,{method: 'DELETE'}).then(response => {
+            if (response.ok)
+            {
+              newData.splice(index, 1);
+              setData(newData);
+              success('Deleted successfully');
+            }
+            else
+            {
+              logErrorFromResponse(response);
+            }
+          })
         } else {
-          newData.push(row);
-          setData(newData);
-          setEditingKey('');
+            error('Not found entity to delete');
         }
-        
-        fetch(`https://localhost:7167/Resources/DeleteResource/${key}`,{method: 'DELETE'})
-      } catch (errInfo) {
+      } 
+      catch (errInfo) {
         console.log('Validate Failed:', errInfo);
       }
     };
@@ -118,77 +129,90 @@ const ResourceTable = (originData) => {
       const index = newData.findIndex((item) => key === item.key);
         
       if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, { ...item, ...row });
-        setData(newData);
-        setEditingKey('');
-      } else {
-        newData.push(row);
-        setData(newData);
-        setEditingKey('');
-      }
+        var response = await fetch(`https://localhost:7167/Resources/UpdateResource/${key}/${row.name}`,{method: 'POST'})
       
-      fetch(`https://localhost:7167/Resources/UpdateResource/${key}/${row.name}`,{method: 'POST'})
+        if (response.ok)
+        {
+          const item = newData[index];
+          newData.splice(index, 1, { ...item, ...row });
+          setData(newData);
+          setEditingKey('');
+          success('Added successfully');
+        }
+        else
+        {
+          logErrorFromResponse(response);
+        }
+      } else {
+        error('No entity to update');
+      }
     } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
+      error('Validate Failed: ' +  errInfo);
     }
   };
 
-    const columns = [
-      {
-        title: 'GUID',
-        dataIndex: 'guid',
-        width: '30%',
-      },
-      {
-        title: 'Name',
-        dataIndex: 'name',
-        sorter: (a, b) => a.name.length - b.name.length,
-        editable: true,
-      },
-      {
-        title: 'Edit',
-        dataIndex: 'operation',
-        render: (_, record) => {
-          const editable = isEditing(record);
-          return editable ? (
-            <span>
-              <Typography.Link
-                onClick={() => save(record.guid)}
-                style={{
-                  marginRight: 8,
-                }}
-              >
-                Save
-              </Typography.Link>
-              <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                <a>Cancel</a>
-              </Popconfirm>
-            </span>
-          ) : (
+  const columns = [
+    {
+      title: 'GUID',
+      dataIndex: 'guid',
+      width: '30%',
+    },
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      sorter: (a, b) => a.name.length - b.name.length,
+      editable: true,
+    },
+    {
+      title: 'Edit',
+      dataIndex: 'operation',
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
           <span>
-            <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
-              Edit
+            <Typography.Link
+              onClick={() => save(record.guid)}
+              style={{
+                marginRight: 8,
+              }}
+            >
+              Save
             </Typography.Link>
+            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+              <a>Cancel</a>
+            </Popconfirm>
           </span>
-          );
-        },
+        ) : (
+        <span>
+          <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+            Edit
+          </Typography.Link>
+        </span>
+        );
       },
-      {
-        title: 'Delete',
-        dataIndex: 'operation2',
-        render: (_, record) => {
-          const editable = isDeleting(record);
-          return (
-          <span>
-          <Popconfirm title="Sure to Delete?" onConfirm={() => deleteItem(record.guid)}>
-            <a>Delete</a>
-          </Popconfirm>
-          </span>
-          );
-        },
-      }
-    ];
+    },
+    {
+      title: 'Delete',
+      dataIndex: 'operation2',
+      render: (_, record) => {
+        return (
+        <span>
+        <Popconfirm title="Sure to Delete?" onConfirm={() => deleteItem(record.guid)}>
+          <a>Delete</a>
+        </Popconfirm>
+        </span>
+        );
+      },
+    }
+  ];
+    
+  const error = (messageText) => {
+    message.error(messageText);
+  };
+  
+  const success = (messageText) => {
+    message.success(messageText);
+  };
 
   const mergedColumns = columns.map((col) => {
     if (!col.editable) {
