@@ -128,7 +128,7 @@ const ResourceTable = (originData) => {
         setEditingKey('');
       }
       
-      fetch(`https://localhost:7167/Resources/UpdateResource/${key}/${row.name}`,{method: 'POST'})
+      fetch(`https://localhost:7167/Resources/UpdateResource/${key}/${row.name}`,{method: 'DELETE'})
     } catch (errInfo) {
       console.log('Validate Failed:', errInfo);
     }
