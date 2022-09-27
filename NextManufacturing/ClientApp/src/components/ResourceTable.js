@@ -175,33 +175,19 @@ const ResourceTable = (originData) => {
         },
       },
       {
-              title: 'Delete',
-              dataIndex: 'operation',
-              render: (_, record) => {
-                const editable = isDeleting(record);
-                return editable ? (
-                  <span>
-                    <Typography.Link
-                      onClick={() => deleteItem(record.guid)}
-                      style={{
-                        marginRight: 8,
-                      }}
-                    >
-                      Save
-                    </Typography.Link>
-                    <Popconfirm title="Sure to delete?" onConfirm={deleteItem}>
-                      <a>Cancel</a>
-                    </Popconfirm>
-                  </span>
-                ) : (
-                <span>
-                  <Typography.Link disabled={deletingKey !== ''} onClick={() => deleteButton(record)}>
-                    Delete
-                  </Typography.Link>
-                </span>
-                );
-              },
-            }
+        title: 'Delete',
+        dataIndex: 'operation2',
+        render: (_, record) => {
+          const editable = isDeleting(record);
+          return (
+          <span>
+          <Popconfirm title="Sure to Delete?" onConfirm={() => deleteItem(record.guid)}>
+            <a>Delete</a>
+          </Popconfirm>
+          </span>
+          );
+        },
+      }
     ];
 
   const mergedColumns = columns.map((col) => {
