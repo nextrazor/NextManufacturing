@@ -232,7 +232,7 @@ const ResourceTable = (originData) => {
   });
   return (
   <span>
-    <Button type="primary" onClick={showModal} style={{marginBottom: "15px"}}>
+    <Button type="primary" onClick={showModal} style={{marginBottom: "15px", float:'right'}}>
       New Resources
     </Button>
     <Form form={form} component={false}>

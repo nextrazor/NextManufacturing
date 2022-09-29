@@ -23,7 +23,7 @@ export class LocalLayout extends Component {
 
     render () {
         return (
-            <Layout>
+            <Layout style={{height:"100vh"}}>
                 <Sider trigger={null} collapsible collapsed={this.state.collapsed}>
                     <div className="logo" />
                     <NavMenu />

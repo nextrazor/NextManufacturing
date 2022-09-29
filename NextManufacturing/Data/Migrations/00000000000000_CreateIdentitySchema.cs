@@ -27,15 +27,15 @@ namespace NextManufacturing.Data.Migrations
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    EmailConfirmed = table.Column<bool>(type: "BOOLEAN", nullable: false),
                     PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
                     SecurityStamp = table.Column<string>(type: "TEXT", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
                     PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "BOOLEAN", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "BOOLEAN", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "TIMESTAMP with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "BOOLEAN", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table => { table.PrimaryKey("PK_AspNetUsers", x => x.Id); });
@@ -50,8 +50,8 @@ namespace NextManufacturing.Data.Migrations
                     SessionId = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     ClientId = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Expiration = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "TIMESTAMP", nullable: false),
+                    Expiration = table.Column<DateTime>(type: "TIMESTAMP", nullable: false),
                     Data = table.Column<string>(type: "TEXT", maxLength: 52360, nullable: false)
                 },
                 constraints: table => { table.PrimaryKey("PK_DeviceCodes", x => x.UserCode); });
@@ -62,11 +62,11 @@ namespace NextManufacturing.Data.Migrations
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Version = table.Column<int>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TIMESTAMP", nullable: false),
                     Use = table.Column<string>(type: "TEXT", maxLength: 450, nullable: true),
                     Algorithm = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    IsX509Certificate = table.Column<bool>(type: "INTEGER", nullable: false),
-                    DataProtected = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsX509Certificate = table.Column<bool>(type: "BOOLEAN", nullable: false),
+                    DataProtected = table.Column<bool>(type: "BOOLEAN", nullable: false),
                     Data = table.Column<string>(type: "TEXT", maxLength: 52360, nullable: false)
                 },
                 constraints: table => { table.PrimaryKey("PK_Keys", x => x.Id); });
@@ -81,9 +81,9 @@ namespace NextManufacturing.Data.Migrations
                     SessionId = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     ClientId = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Expiration = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ConsumedTime = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "TIMESTAMP", nullable: false),
+                    Expiration = table.Column<DateTime>(type: "TIMESTAMP", nullable: true),
+                    ConsumedTime = table.Column<DateTime>(type: "TIMESTAMP", nullable: true),
                     Data = table.Column<string>(type: "TEXT", maxLength: 52360, nullable: false)
                 },
                 constraints: table => { table.PrimaryKey("PK_PersistedGrants", x => x.Key); });
