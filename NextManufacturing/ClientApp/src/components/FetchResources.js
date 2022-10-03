@@ -1,47 +1,51 @@
-import React, { Component } from 'react';
-import { Form, Input, InputNumber, Popconfirm, Table, Typography } from 'antd';
+import React, {Component} from 'react';
+import {Form, Input, InputNumber, Popconfirm, Table, Typography} from 'antd';
+import {withTranslation} from 'react-i18next';
 import ResourceTable from './ResourceTable'
 
-export class FetchResources extends Component {
-  static displayName = FetchResources.name;
+class FetchResources extends Component {
+    static displayName = FetchResources.name;
 
-  constructor(props) {
-    super(props);
-    
-    this.state = { data: [], loading: true };
-  }
+    constructor(props) {
+        super(props);
 
-  componentDidMount() {
-    this.populateData();
-  }
-  
-  onChange = (pagination, filters, sorter, extra) => {
-    console.log('params', pagination, filters, sorter, extra);
-  };
+        this.state = {data: [], loading: true};
+    }
 
-  static renderTable(data) {
-    return (
-      <ResourceTable originData={data}  />
-    );
-  }
+    componentDidMount() {
+        this.populateData();
+    }
 
-  render() {
-    let contents = this.state.loading
-      ? <p><em>Loading...</em></p>
-      : <ResourceTable originData={this.state.data}/>;
+    onChange = (pagination, filters, sorter, extra) => {
+        console.log('params', pagination, filters, sorter, extra);
+    };
 
-    return (
-      <div>
-        <h1 id="tabelLabel" >Resources</h1>
-        {contents}
-      </div>
-    );
-  }
+    static renderTable(data) {
+        return (
+            <ResourceTable originData={data}/>
+        );
+    }
 
-  async populateData() {
-    const response = await fetch('https://localhost:7167/Resources');
-    const dataFetched = await response.json();
-    dataFetched.forEach(el => el.key = el.guid)
-    this.setState({ data: dataFetched, loading: false });
-  }
+    render() {
+        const {t} = this.props;
+        let contents = this.state.loading
+            ? <p><em>Loading...</em></p>
+            : <ResourceTable originData={this.state.data}/>;
+
+        return (
+            <div>
+                <h1 id="tabelLabel">{t('components.FetchResources.pageName')}</h1>
+                {contents}
+            </div>
+        );
+    }
+
+    async populateData() {
+        const response = await fetch('https://localhost:7167/Resources');
+        const dataFetched = await response.json();
+        dataFetched.forEach(el => el.key = el.guid)
+        this.setState({data: dataFetched, loading: false});
+    }
 }
+
+export default withTranslation()(FetchResources);
