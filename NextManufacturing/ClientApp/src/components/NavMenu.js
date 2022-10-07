@@ -7,18 +7,22 @@ import {
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu } from 'antd';
+import { useTranslation, Trans } from 'react-i18next';
+import {LoginMenu} from "./api-authorization/LoginMenu";
 
 
 
 export const NavMenu = () => {
   let navigate = useNavigate();
+  const { t } = useTranslation('menu');
 
   function onItemClick(item) {
-    console.log(item);
-    navigate(item.key);
+    if (!item.key.includes('subMenu'))
+        navigate(item.key);
   }
 
   return (
+  <div>
       <Menu
           onClick={onItemClick}
           style={{ height: '100%' }}
@@ -29,29 +33,48 @@ export const NavMenu = () => {
             {
               key: '/',
               icon: <UserOutlined />,
-              label: 'Home',
+              label: t('home'),
             },
             {
               key: '/counter',
               icon: <VideoCameraOutlined />,
-              label: 'Counter',
+              label: t('counter'),
             },
             {
               key: '/fetch-data',
               icon: <UploadOutlined />,
-              label: 'Fetch data',
+              label: t('fetchData'),
             },
             {
               key: '/settings',
               icon: <DownloadOutlined />,
-              label: 'Settings',
+              label: t('settings'),
             },
             {
-              key: '/fetch-resources',
-              icon: <DownloadOutlined />,
-              label: 'Resources',
-            },
+                key:'subMenu1',
+                icon: <DownloadOutlined />,
+                label: t('catalogues'),
+                children:[
+                    {
+                      key: '/fetch-resources',
+                      icon: <DownloadOutlined />,
+                      label: t('resources'),
+                    },
+                    {
+                      key: '/fetch-calendar-periods',
+                      icon: <DownloadOutlined />,
+                      label: t('calendarPeriods'),
+                    },
+                ]
+            
+            }
+            
           ]}
       />
+      <div style={{bottom: 0, left: 0, position: "absolute", marginBottom: "15px"}}>
+          <LoginMenu>
+          </LoginMenu>
+      </div>
+  </div>
   );
 }

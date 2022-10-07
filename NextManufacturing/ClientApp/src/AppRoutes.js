@@ -1,7 +1,8 @@
 import ApiAuthorzationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 import { Counter } from "./components/Counter";
 import { FetchData } from "./components/FetchData";
-import { default as FetchResources } from "./components/FetchResources";
+import { default as FetchResources } from "./components/resources/FetchResources";
+import { default as FetchCalendarPeriods } from "./components/calendarPeriods/FetchCalendarPeriods"
 import { Home } from "./components/Home";
 
 const AppRoutes = [
@@ -22,6 +23,10 @@ const AppRoutes = [
     path: '/fetch-resources',
     element: <FetchResources />
   },
+  {
+      path: '/fetch-calendar-periods',
+      element: <FetchCalendarPeriods />
+    },
   ...ApiAuthorzationRoutes
 ];
 

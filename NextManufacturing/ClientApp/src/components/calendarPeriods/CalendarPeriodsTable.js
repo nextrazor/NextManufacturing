@@ -1,5 +1,6 @@
 import {Form, Input, InputNumber, Popconfirm, Table, Typography, Modal, Button, message} from 'antd';
 import React, {useState} from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 
 const EditableCell = ({
                           editing,
@@ -20,12 +21,6 @@ const EditableCell = ({
                     style={{
                         margin: 0,
                     }}
-                    rules={[
-                        {
-                            required: true,
-                            message: `Please Input ${title}!`,
-                        },
-                    ]}
                 >
                     {inputNode}
                 </Form.Item>
@@ -36,13 +31,14 @@ const EditableCell = ({
     );
 };
 
-const ResourceTable = (originData) => {
+const CalendarPeriodsTable = (originData) => {
     const [form] = Form.useForm();
     const [modalForm] = Form.useForm();
     const [data, setData] = useState(originData.originData);
     const [editingKey, setEditingKey] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const isEditing = (record) => record.key === editingKey;
+    const { t } = useTranslation('calendarPeriodsTable');
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -51,14 +47,14 @@ const ResourceTable = (originData) => {
     const logErrorFromResponse = (response) => {
         response.json().then(parsedResponse => {
             console.log(parsedResponse);
-            error('Error ' + parsedResponse.error);
+            error(t('messages.error') + parsedResponse.error);
         })
     }
 
     const handleOk = async () => {
         const row = await modalForm.validateFields();
         if (row.name && row.name != undefined && row.name != '') {
-            fetch(`https://localhost:7167/Resources/CreateResource/${row.name}`, {method: 'POST'}).then(response => {
+            fetch(`https://localhost:7167/CalendarStates/CreateCalendarState/${row.name}`, {method: 'POST'}).then(response => {
                 if (response.ok) {
                     response.json().then(parsedResponse => {
                         parsedResponse.key = parsedResponse.guid;
@@ -67,13 +63,13 @@ const ResourceTable = (originData) => {
                         setData(newData);
                         modalForm.resetFields();
                         setIsModalOpen(false);
-                        success('Item added successfully');
+                        success(t('messages.addSuccess'));
                     });
                 } else
                     logErrorFromResponse(response);
             });
         } else
-            error('No resource name entered!');
+            error(t('messages.noNameError'));
     };
 
     const handleCancel = async () => {
@@ -101,17 +97,17 @@ const ResourceTable = (originData) => {
             const index = newData.findIndex((item) => key === item.key);
 
             if (index > -1) {
-                fetch(`https://localhost:7167/Resources/DeleteResource/${key}`, {method: 'DELETE'}).then(response => {
+                fetch(`https://localhost:7167/CalendarStates/DeleteCalendarState/${key}`, {method: 'DELETE'}).then(response => {
                     if (response.ok) {
                         newData.splice(index, 1);
                         setData(newData);
-                        success('Deleted successfully');
+                        success(t('messages.deleteSuccess'));
                     } else {
                         logErrorFromResponse(response);
                     }
                 })
             } else {
-                error('Not found entity to delete');
+                error(t('messages.noDeleteItem'));
             }
         } catch (errInfo) {
             console.log('Validate Failed:', errInfo);
@@ -125,19 +121,19 @@ const ResourceTable = (originData) => {
             const index = newData.findIndex((item) => key === item.key);
 
             if (index > -1) {
-                var response = await fetch(`https://localhost:7167/Resources/UpdateResource/${key}/${row.name}`, {method: 'POST'})
+                var response = await fetch(`https://localhost:7167/CalendarStates/UpdateCalendarState/${key}/${row.name}`, {method: 'POST'})
 
                 if (response.ok) {
                     const item = newData[index];
                     newData.splice(index, 1, {...item, ...row});
                     setData(newData);
                     setEditingKey('');
-                    success('Added successfully');
+                    success(t('messages.updateSuccess'));
                 } else {
                     logErrorFromResponse(response);
                 }
             } else {
-                error('No entity to update');
+                error(t('messages.noUpdateItem'));
             }
         } catch (errInfo) {
             error('Validate Failed: ' + errInfo);
@@ -157,7 +153,7 @@ const ResourceTable = (originData) => {
             editable: true,
         },
         {
-            title: 'Edit',
+            title: t('edit'),
             dataIndex: 'operation',
             render: (_, record) => {
                 const editable = isEditing(record);
@@ -171,27 +167,27 @@ const ResourceTable = (originData) => {
             >
               Save
             </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+            <Popconfirm title={t('confirmCancel')} onConfirm={cancel}>
               <a>Cancel</a>
             </Popconfirm>
           </span>
                 ) : (
                     <span>
           <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
-            Edit
+            {t('edit')}
           </Typography.Link>
         </span>
                 );
             },
         },
         {
-            title: 'Delete',
+            title: t('delete'),
             dataIndex: 'operation2',
             render: (_, record) => {
                 return (
                     <span>
-        <Popconfirm title="Sure to Delete?" onConfirm={() => deleteItem(record.guid)}>
-          <a>Delete</a>
+        <Popconfirm title={t('confirmDelete')} onConfirm={() => deleteItem(record.guid)}>
+          <a>{t('delete')}</a>
         </Popconfirm>
         </span>
                 );
@@ -226,7 +222,7 @@ const ResourceTable = (originData) => {
     return (
         <span>
     <Button type="primary" onClick={showModal} style={{marginBottom: "15px", float: 'right'}}>
-      New Resources
+      {t('new')}
     </Button>
     <Form form={form} component={false}>
       <Table
@@ -244,9 +240,9 @@ const ResourceTable = (originData) => {
           }}
       />
     </Form>
-    <Modal title="New resource" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+    <Modal title={t('new')} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
       <Form form={modalForm} component={false}>
-        <Form.Item label="Name" name="name">
+        <Form.Item label={t('name')} name="name">
           <Input onPressEnter={handleOk}/>
         </Form.Item>
       </Form>
@@ -255,4 +251,4 @@ const ResourceTable = (originData) => {
     );
 };
 
-export default ResourceTable;
+export default CalendarPeriodsTable;

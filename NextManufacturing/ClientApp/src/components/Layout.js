@@ -27,12 +27,11 @@ export class LocalLayout extends Component {
                 <Sider trigger={null} collapsible collapsed={this.state.collapsed}>
                     <div className="logo" />
                     <NavMenu />
+                    
                 </Sider>
                 <Layout className="site-layout">
                     <Header className="site-layout-background" style={{ padding: 0 }}>
                         
-                    <LoginMenu>
-                    </LoginMenu>
                     </Header>
                     <Content
                         className="site-layout-background"

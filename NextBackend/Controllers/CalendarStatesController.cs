@@ -41,6 +41,19 @@ namespace NextBackend.Controllers
             await _dbContext.SaveChangesAsync();
             return calendarState;
         }
+        
+        [HttpPost]
+        [Route("UpdateCalendarState/{guid}/{name}")]
+        public async Task<bool> Create(Guid guid, string name)
+        {
+            var resource = _dbContext.CalendarStates.FirstOrDefault(r => r.Guid == guid);
+            if (resource == null)
+                return false;
+            resource.Name = name;
+            _dbContext.CalendarStates.Update(resource);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
 
         [HttpDelete]
         [Route("DeleteCalendarState/{guid:guid}")]

@@ -20,8 +20,9 @@ i18n
         lng: 'en',
         fallbackLng: 'en',
         preload: ['en', 'ru'],
-        ns: ['translation'],
-        defaultNS: 'translation',
+        ns: ['resources'],
+        defaultNS: 'resources',
+        loadPath: '/locales/{{lng}}/{{ns}}.json',
         interpolation: {
             escapeValue: false, // not needed for react as it escapes by default
             // format: (value, format, lng) => { // legacy usage

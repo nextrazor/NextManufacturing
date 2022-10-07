@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import {Form, Input, InputNumber, Popconfirm, Table, Typography} from 'antd';
+import {Form, Input, InputNumber, Popconfirm, Table, Modal, Typography} from 'antd';
 import {withTranslation} from 'react-i18next';
-import ResourceTable from './ResourceTable'
+import CalendarPeriodsTable from './CalendarTemplatesTable'
 
-class FetchResources extends Component {
-    static displayName = FetchResources.name;
-
+class FetchCalendarPeriods extends Component {
+    static displayName = FetchCalendarPeriods.name;
+    
     constructor(props) {
         super(props);
 
@@ -20,32 +20,26 @@ class FetchResources extends Component {
         console.log('params', pagination, filters, sorter, extra);
     };
 
-    static renderTable(data) {
-        return (
-            <ResourceTable originData={data}/>
-        );
-    }
-
     render() {
         const {t} = this.props;
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : <ResourceTable originData={this.state.data}/>;
+            : <CalendarTemplatesTable originData={this.state.data}/>;
 
         return (
             <div>
-                <h1 id="tabelLabel">{t('components.FetchResources.pageName')}</h1>
+                <h1 id="tabelLabel">{t('pageName')}</h1>
                 {contents}
             </div>
         );
     }
 
     async populateData() {
-        const response = await fetch('https://localhost:7167/Resources');
+        const response = await fetch('https://localhost:7167/CalendarTemplates');
         const dataFetched = await response.json();
         dataFetched.forEach(el => el.key = el.guid)
         this.setState({data: dataFetched, loading: false});
     }
 }
 
-export default withTranslation()(FetchResources);
+export default withTranslation('calendarTemplates')(FetchCalendarPeriods);
