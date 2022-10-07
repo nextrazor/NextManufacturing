@@ -1,10 +1,10 @@
-import {Form, Input, InputNumber, Popconfirm, Table, Typography, Button, Modal, message} from 'antd';
-import React, {useState} from 'react';
+import {Form, Input, InputNumber, Popconfirm, Table, Cascader, Button, Modal, message} from 'antd';
+import React, {useState, useEffect} from 'react';
 import {useTranslation, Trans} from 'react-i18next';
 
-const CalendarTemplateModal = (originData) => {
+const CalendarTemplateModal = (updateCallback) => {
     const [modalForm] = Form.useForm();
-    const [data, setData] = useState(originData.originData);
+    const [data, setData] = useState();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const {t} = useTranslation('calendarTemplatesModal');
 
@@ -26,6 +26,7 @@ const CalendarTemplateModal = (originData) => {
                         modalForm.resetFields();
                         setIsModalOpen(false);
                         success(t('messages.addSuccess'));
+                        updateCallback.call();
                     });
                 } else
                     logErrorFromResponse(response);
@@ -55,6 +56,25 @@ const CalendarTemplateModal = (originData) => {
         message.success(messageText);
     };
 
+    
+    useEffect(() => {  fetch(`https://localhost:7167/CalendarStates`, {method: 'GET'}).then(response => {
+        if (response.ok) {
+            response.json().then(data=> {
+                data.forEach(el => {el.value = el.guid; el.label = el.name})
+                console.log(data);
+                setData(data);
+                success(t('messages.deleteSuccess'));
+            })
+            
+        } else {
+            logErrorFromResponse(response);
+        }
+    }) },[]);
+
+    const onChangeCascader = (value) => {
+        console.log(value);
+    }
+
 
     return (
         <span>
@@ -65,6 +85,12 @@ const CalendarTemplateModal = (originData) => {
                 <Form form={modalForm} component={false}>
                     <Form.Item label={t('name')} name="name">
                         <Input onPressEnter={handleOk}/>
+                    </Form.Item>
+                    <Form.Item label={t('defaultSpan')} name="spanGuid">
+                        <Cascader options={data} onChange={onChangeCascader} placeholder={t('defaultSpanPlaceholder')}/>
+                    </Form.Item>
+                    <Form.Item label={t('timeFieldName')} name="length">
+                        <InputNumber addonBefore="+" addonAfter={t("hours")} defaultValue={1} />
                     </Form.Item>
                 </Form>
             </Modal>

@@ -68,7 +68,7 @@ const CalendarTemplatesTable = (originData) => {
             const index = newData.findIndex((item) => key === item.key);
 
             if (index > -1) {
-                fetch(`https://localhost:7167/CalendarStates/DeleteCalendarTemplates/${key}`, {method: 'DELETE'}).then(response => {
+                fetch(`https://localhost:7167/CalendarTemplates/DeleteCalendarTemplates/${key}`, {method: 'DELETE'}).then(response => {
                     if (response.ok) {
                         newData.splice(index, 1);
                         setData(newData);
@@ -92,7 +92,7 @@ const CalendarTemplatesTable = (originData) => {
             const index = newData.findIndex((item) => key === item.key);
 
             if (index > -1) {
-                var response = await fetch(`https://localhost:7167/CalendarStates/UpdateCalendarState/${key}/${row.name}`, {method: 'POST'})
+                var response = await fetch(`https://localhost:7167/CalendarTemplates/UpdateCalendarTemplates/${key}/${row.name}`, {method: 'POST'})
 
                 if (response.ok) {
                     const item = newData[index];
@@ -124,6 +124,12 @@ const CalendarTemplatesTable = (originData) => {
             editable: true,
         },
         {
+            title: 'Length',
+            dataIndex: 'length',
+            sorter: (a, b) => a.name.length - b.name.length,
+            editable: true,
+        },
+        {
             title: t('edit'),
             dataIndex: 'operation',
             render: (_, record) => {
@@ -150,6 +156,17 @@ const CalendarTemplatesTable = (originData) => {
         </span>
                 );
             },
+        },
+        {
+            title: t('configure'),
+            dataIndex: 'operation3',
+            render: (_, record) => {
+                return(
+                <span>
+                    <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+                        {t('configure')}
+                    </Typography.Link>
+                </span>)}
         },
         {
             title: t('delete'),

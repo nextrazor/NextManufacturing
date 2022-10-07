@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import {Form, Input, InputNumber, Popconfirm, Table, Modal, Typography} from 'antd';
 import {withTranslation} from 'react-i18next';
-import CalendarPeriodsTable from './CalendarTemplatesTable'
+import CalendarTemplatesTable from './CalendarTemplatesTable'
+import CalendarTemplateModal from './CalendarTemplateModal'
 
 class FetchCalendarPeriods extends Component {
     static displayName = FetchCalendarPeriods.name;
@@ -20,6 +21,10 @@ class FetchCalendarPeriods extends Component {
         console.log('params', pagination, filters, sorter, extra);
     };
 
+    update() {
+
+    }
+
     render() {
         const {t} = this.props;
         let contents = this.state.loading
@@ -29,6 +34,7 @@ class FetchCalendarPeriods extends Component {
         return (
             <div>
                 <h1 id="tabelLabel">{t('pageName')}</h1>
+                <CalendarTemplateModal call={this.update}/>
                 {contents}
             </div>
         );

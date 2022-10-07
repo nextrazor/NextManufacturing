@@ -1,0 +1,9 @@
+{
+  "pageName": "Calendar Periods",
+  "new": "New Period",
+  "name":"Name",
+  "defaultSpan":"Default state",
+  "defaultSpanPlaceholder":"Select default state",
+  "timeFieldName":"Time length",
+  "hours":"Hours"
+}

@@ -65,6 +65,11 @@ export const NavMenu = () => {
                       icon: <DownloadOutlined />,
                       label: t('calendarPeriods'),
                     },
+                    {
+                      key: '/fetch-calendar-templates',
+                      icon: <DownloadOutlined />,
+                      label: t('calendarTemplates'),
+                    },
                 ]
             
             }
