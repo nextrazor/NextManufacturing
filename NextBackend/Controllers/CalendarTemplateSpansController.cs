@@ -23,6 +23,13 @@ namespace NextBackend.Controllers
             return _dbContext.CalendarTemplateSpans.ToList();
         }
 
+        [HttpGet]
+        [Route("GetSpansByTemplate/{calendarTemplateGuid:guid}")]
+        public IEnumerable<CalendarTemplateSpan> Read(Guid calendarTemplateGuid)
+        {
+            return _dbContext.CalendarTemplateSpans.Where(el => el.CalendarTemplateGuid == calendarTemplateGuid).ToList();
+        }
+
         [HttpPost]
         [Route("CreateCalendarTemplateSpan/{calendarTemplateGuid:guid}/{stateGuid:guid}/{fromTime:double}/{toTime:double}")]
         public async Task<CalendarTemplateSpan> Create(Guid calendarTemplateGuid, Guid stateGuid, double fromTime, double toTime)

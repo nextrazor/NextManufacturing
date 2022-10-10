@@ -1,10 +1,9 @@
-import {Form, Input, InputNumber, DatePicker, Cascader, Button, Modal, message} from 'antd';
+import {Form, Input, InputNumber, Popconfirm, Table, Cascader, Button, Modal, message} from 'antd';
 import React, {useState, useEffect} from 'react';
-import {useTranslation, Trans} from 'react-i18next';//formatter
-import {eventEmitter} from '../../systems/Events.ts'
-import {formatter} from '../../systems/Formatter'
+import {useTranslation, Trans} from 'react-i18next';
+import {eventEmitter} from '../../../systems/Events'
 
-const CalendarTemplateModal = () => {
+const CalendarTemplateModal = (updateCallback) => {
     const [modalForm] = Form.useForm();
     const [data, setData] = useState();
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,19 +15,19 @@ const CalendarTemplateModal = () => {
 
     const handleOk = async () => {
         const row = await modalForm.validateFields();
-        if (row.length == undefined)
-            row.length = 1;
-        if (row.refDate == undefined)
-            row.refDate = Date.now();
         if (row.name && row.name != undefined && row.name != '') {
-            fetch(`https://localhost:7167/CalendarTemplates/CreateCalendarTemplate/${row.name}/${row.spanGuid[0]}/${row.length}/${formatter.formatAntDateTime(row.refDate)}`
+            fetch(`https://localhost:7167/CalendarTemplates/CreateCalendarTemplates/${row.name}`
                 , {method: 'POST'}).then(response => {
                 if (response.ok) {
                     response.json().then(parsedResponse => {
-                        eventEmitter.dispatch('updateData_CT', parsedResponse);
+                        parsedResponse.key = parsedResponse.guid;
+                        const newData = [...data];
+                        newData.push(parsedResponse);
+                        setData(newData);
                         modalForm.resetFields();
                         setIsModalOpen(false);
                         success(t('messages.addSuccess'));
+                        updateCallback.call();
                     });
                 } else
                     logErrorFromResponse(response);
@@ -92,10 +91,7 @@ const CalendarTemplateModal = () => {
                         <Cascader options={data} onChange={onChangeCascader} placeholder={t('defaultSpanPlaceholder')}/>
                     </Form.Item>
                     <Form.Item label={t('timeFieldName')} name="length">
-                        <InputNumber addonAfter={t("hours")} defaultValue={1} />
-                    </Form.Item>
-                    <Form.Item label={t('referenceDate')} name="refDate">
-                        <DatePicker showTime format='DD.MM.YYYY HH:mm' placeholder={t('defaultTimePlaceholder')}/>
+                        <InputNumber addonBefore="+" addonAfter={t("hours")} defaultValue={1} />
                     </Form.Item>
                 </Form>
             </Modal>

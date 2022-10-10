@@ -1,6 +1,7 @@
 import {Form, Input, InputNumber, Popconfirm, Table, Typography, Button, message} from 'antd';
 import React, {useState} from 'react';
 import { useTranslation, Trans } from 'react-i18next';
+import {eventEmitter} from '../../systems/Events.ts'
 
 const EditableCell = ({
                           editing,
@@ -39,6 +40,17 @@ const CalendarTemplatesTable = (originData) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const isEditing = (record) => record.key === editingKey;
     const { t } = useTranslation('calendarTemplatesTable');
+
+    console.log(originData)
+
+    eventEmitter.subscribe('updateData_CT', (event) => addItem(event));
+
+    const addItem = (item) =>{
+        item.key = item.guid;
+        const newData = [...data];
+        newData.push(item);
+        setData(newData);
+    }
 
 
     const logErrorFromResponse = (response) => {
@@ -125,8 +137,14 @@ const CalendarTemplatesTable = (originData) => {
         },
         {
             title: 'Length',
-            dataIndex: 'length',
-            sorter: (a, b) => a.name.length - b.name.length,
+            dataIndex: 'periodDuration',
+            sorter: (a, b) => a.periodDuration - b.periodDuration,
+            editable: true,
+        },
+        {
+            title: 'Length',
+            dataIndex: 'date',
+            sorter: (a, b) => a.periodDuration - b.periodDuration,
             editable: true,
         },
         {

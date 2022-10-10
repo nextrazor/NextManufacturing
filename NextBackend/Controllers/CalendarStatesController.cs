@@ -23,6 +23,13 @@ namespace NextBackend.Controllers
             return _dbContext.CalendarStates.ToList();
         }
 
+        [HttpGet]
+        [Route("GetByGuid/{Guid}")]
+        public CalendarState Read(Guid guid)
+        {
+            return _dbContext.CalendarStates.Where(el => el.Guid == guid).First();
+        }
+
         [HttpPost]
         [Route("CreateCalendarState/{name}")]
         public async Task<CalendarState> Create(string name)

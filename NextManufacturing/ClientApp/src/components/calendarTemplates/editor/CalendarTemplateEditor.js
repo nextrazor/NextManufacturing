@@ -1,67 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import { Bar } from '@ant-design/plots';
+import React, {Component} from 'react';
+import {Form, Input, InputNumber, Popconfirm, Table, Modal, Typography} from 'antd';
+import {withTranslation} from 'react-i18next';
+import CalendarTemplatessEditorTable from './CalendarTemplatesEditorTable'
+import CalendarTemplatesEditorModal from './CalendarTemplatesEditorModal'
+import CalendarTemplatesEditorPlot from './CalendarTemplatesEditorPlot'
+import {eventEmitter} from '../../../systems/Events'
 
-const DemoBar = () => {
-  const data = [
-    {
-      year: '1991',
-      value: 1,
-      type: 'работа',
-      colorText: 'red'
-    },
-    {
-      year: '1991',
-      value: 2,
-      type: 'простой',
-      colorText: 'green'
-    },
-    {
-      year: '1991',
-      value: 3,
-      type: 'работа2',
-      colorText: 'red'
-    },
-    {
-      year: '1991',
-      value: 5,
-      type: 'работа3',
-      colorText: 'green'
-    },
+class FetchCalendarTemplatesEditor extends Component {
+    static displayName = FetchCalendarTemplatesEditor.name;
     
-  ];
-  const config = {
-    data: data.reverse(),
-    isStack: true,
-    xField: 'value',
-    yField: 'year',
-    seriesField: 'type',
-    color: ({ type }) => {
-    if(type.includes('работа')){
-        return '#597ef7';
-      }
-      return '#ffc069';
-    },
-    label: {
-      // 可手动配置 label 数据标签位置
-      position: 'middle',
-      // 'left', 'middle', 'right'
-      // 可配置附加的布局方法
-      layout: [
-        // 柱形图数据标签位置自动调整
-        {
-          type: 'interval-adjust-position',
-        }, // 数据标签防遮挡
-        {
-          type: 'interval-hide-overlap',
-        }, // 数据标签文颜色自动调整
-        {
-          type: 'adjust-color',
-        },
-      ],
-    },
-  };
-  return <Bar {...config} />;
-};
+    constructor(props) {
+        super(props);
 
-ReactDOM.render(<DemoBar />, document.getElementById('container'));
+        this.state = {data: [ ], templateToEdit: props.template, defaultState: {}, loading: true};
+    }
+
+    componentDidMount() {
+        this.populateData();
+        eventEmitter.subscribe('updateData_CTEditor', (event) => this.populateData(event));
+    }
+
+    render() {
+        const {t} = this.props;
+        let contents = this.state.loading
+            ? <p><em>Loading...</em></p>
+            :<div><CalendarTemplatesEditorPlot originData={this.state}/><CalendarTemplatesEditorTable originData={this.state.data}/></div> ;
+
+        return (
+            <div>
+                <h1 id="tabelLabel">{t('pageName')}</h1>
+                <CalendarTemplateEditorModal call={this.update}/>
+                {contents}
+            </div>
+        );
+    }
+
+    async populateData() {
+        const response = await fetch('https://localhost:7167/CalendarTemplateSpans/GetSpansByTemplate/'+this.state.templateToEdit.guid);
+        const templateSpansFetched = await response.json();
+        templateSpansFetched.forEach(el => el.key = el.guid)
+        this.setState({data: templateSpansFetched});
+
+        const response2 = await fetch('https://localhost:7167/CalendarStates/GetByGuid/'+this.state.templateToEdit.defaultStateGuid);
+        const defaultStateFetched = await response.json();
+        this.setState({defaultState: defaultStateFetched, loading: false});
+    }
+}
+
+export default withTranslation('calendarTemplatesEditor')(FetchCalendarTemplatesEditor);

@@ -4,8 +4,8 @@ import {withTranslation} from 'react-i18next';
 import CalendarTemplatesTable from './CalendarTemplatesTable'
 import CalendarTemplateModal from './CalendarTemplateModal'
 
-class FetchCalendarPeriods extends Component {
-    static displayName = FetchCalendarPeriods.name;
+class FetchCalendarTemplates extends Component {
+    static displayName = FetchCalendarTemplates.name;
     
     constructor(props) {
         super(props);
@@ -21,10 +21,6 @@ class FetchCalendarPeriods extends Component {
         console.log('params', pagination, filters, sorter, extra);
     };
 
-    update() {
-
-    }
-
     render() {
         const {t} = this.props;
         let contents = this.state.loading
@@ -34,7 +30,7 @@ class FetchCalendarPeriods extends Component {
         return (
             <div>
                 <h1 id="tabelLabel">{t('pageName')}</h1>
-                <CalendarTemplateModal call={this.update}/>
+                <CalendarTemplateModal/>
                 {contents}
             </div>
         );
@@ -43,9 +39,12 @@ class FetchCalendarPeriods extends Component {
     async populateData() {
         const response = await fetch('https://localhost:7167/CalendarTemplates');
         const dataFetched = await response.json();
-        dataFetched.forEach(el => el.key = el.guid)
+        dataFetched.forEach(el => {
+            el.key = el.guid;
+            el.date = Date(el.referenceDate);
+        });
         this.setState({data: dataFetched, loading: false});
     }
 }
 
-export default withTranslation('calendarTemplates')(FetchCalendarPeriods);
+export default withTranslation('calendarTemplates')(FetchCalendarTemplates);
