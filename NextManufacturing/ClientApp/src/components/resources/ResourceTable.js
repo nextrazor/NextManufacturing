@@ -120,8 +120,13 @@ const ResourceTable = (originData) => {
             const newData = [...data];
             const index = newData.findIndex((item) => key === item.key);
 
+            var commandBuff = '';
+            for(var name in row) {
+                commandBuff += '/' + row[name];
+            }
+
             if (index > -1) {
-                var response = await fetch(`https://localhost:7167/Resources/UpdateResource/${key}/${row.name}`, {method: 'POST'})
+                var response = await fetch(`https://localhost:7167/Resources/UpdateResource/${key}` + commandBuff, {method: 'POST'})
 
                 if (response.ok) {
                     const item = newData[index];
@@ -144,7 +149,6 @@ const ResourceTable = (originData) => {
         {
             title: 'GUID',
             dataIndex: 'guid',
-            width: '30%',
         },
         {
             title: 'Name',

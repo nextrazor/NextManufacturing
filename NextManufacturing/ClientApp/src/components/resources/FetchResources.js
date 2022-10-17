@@ -35,9 +35,25 @@ class FetchResources extends Component {
     }
 
     async populateData() {
+        const tableConfigFetched = await fetch('https://localhost:7167/DataScheme/Resource');
+
+        const tableConfig = await tableConfigFetched.json();
+        // tableConfig.fields.forEach(el => {
+        //     el.key = el.guid;
+        // });
+
+        var test = [1, 2]
+        var test2 = [3, 4]
+        var testRes = test+test2;
+        console.log(testRes);
+
+
         const response = await fetch('https://localhost:7167/Resources');
         const dataFetched = await response.json();
-        dataFetched.forEach(el => el.key = el.guid)
+        dataFetched.forEach(el => {
+            el.key = el.guid;
+        });
+
         this.setState({data: dataFetched, loading: false});
     }
 }

@@ -3,6 +3,7 @@ import {Form, Input, InputNumber, Popconfirm, Table, Modal, Typography} from 'an
 import {withTranslation} from 'react-i18next';
 import CalendarTemplatesTable from './CalendarTemplatesTable'
 import CalendarTemplateModal from './CalendarTemplateModal'
+import dayjs from 'dayjs';
 
 class FetchCalendarTemplates extends Component {
     static displayName = FetchCalendarTemplates.name;
@@ -41,9 +42,17 @@ class FetchCalendarTemplates extends Component {
         const dataFetched = await response.json();
         dataFetched.forEach(el => {
             el.key = el.guid;
-            el.date = Date(el.referenceDate);
+            el.date = dayjs(el.referenceDate); //Date(el.referenceDate)
         });
-        this.setState({data: dataFetched, loading: false});
+        
+         const response2 = await fetch('https://localhost:7167/CalendarStates');
+         const dataFetched2 = await response2.json();
+         dataFetched2.forEach(el => {
+            el.value = el.guid;
+            el.label = el.name;
+         })
+         
+        this.setState({data: { templates: dataFetched, periods: dataFetched2  }, loading: false});
     }
 }
 

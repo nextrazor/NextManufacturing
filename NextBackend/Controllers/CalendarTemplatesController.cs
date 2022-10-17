@@ -18,9 +18,20 @@ namespace NextBackend.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<CalendarTemplate> Read()
+        public IEnumerable<CalendarTemplateTransfer> Read() //TODO Антоша, солнышко, я тут херни натворил, нужно подпроавить =*
         {
-            return _dbContext.CalendarTemplates.ToList();
+            var stateList = _dbContext.CalendarStates.ToList();
+            var data = _dbContext.CalendarTemplates
+                .Select(el => new CalendarTemplateTransfer()
+                {
+                    guid = el.Guid,
+                    name = el.Name,
+                    defaultStateGuid = el.DefaultStateGuid, 
+                    defaultStateName = stateList.Where(state => state.Guid == el.DefaultStateGuid).Single().Name,
+                    periodDuration = el.PeriodDuration,
+                    referenceDate = el.ReferenceDate
+                }).ToList();
+            return data;
         }
 
         [HttpPost]
@@ -84,5 +95,16 @@ namespace NextBackend.Controllers
             await _dbContext.SaveChangesAsync();
             return true;
         }
+    }
+
+    //TODO Антоша, солнышко, я тут херни натворил, нужно подпроавить =*
+    public class CalendarTemplateTransfer
+    {
+        public Guid guid;
+        public string name;
+        public Guid defaultStateGuid;
+        public string defaultStateName;
+        public TimeSpan periodDuration;
+        public DateTimeOffset referenceDate;
     }
 }

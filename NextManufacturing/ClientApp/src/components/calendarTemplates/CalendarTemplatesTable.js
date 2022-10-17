@@ -1,4 +1,4 @@
-import {Form, Input, InputNumber, Popconfirm, Table, Typography, Button, message} from 'antd';
+import {Form, Input, InputNumber, Popconfirm, Cascader, DatePicker, Table, Typography, Button, message} from 'antd';
 import React, {useState} from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import {eventEmitter} from '../../systems/Events.ts'
@@ -35,7 +35,8 @@ const EditableCell = ({
 const CalendarTemplatesTable = (originData) => {
     const [form] = Form.useForm();
     const [modalForm] = Form.useForm();
-    const [data, setData] = useState(originData.originData);
+    const [data, setData] = useState(originData.originData.templates);
+    const [periods, setPeriods] = useState(originData.originData.periods);
     const [editingKey, setEditingKey] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const isEditing = (record) => record.key === editingKey;
@@ -55,7 +56,6 @@ const CalendarTemplatesTable = (originData) => {
 
     const logErrorFromResponse = (response) => {
         response.json().then(parsedResponse => {
-            console.log(parsedResponse);
             error(t('messages.error') + parsedResponse.error);
         })
     }
@@ -142,10 +142,42 @@ const CalendarTemplatesTable = (originData) => {
             editable: true,
         },
         {
-            title: 'Length',
+            title: 'Date',
             dataIndex: 'date',
             sorter: (a, b) => a.periodDuration - b.periodDuration,
-            editable: true,
+            render: (_, record) => {
+                        const editable = isEditing(record);
+            return editable ? (
+                            <span>
+                                <Form.Item name="date">
+                                    <DatePicker showTime format='DD.MM.YYYY HH:mm' />
+                                </Form.Item>
+                            </span>
+                        ) : (
+                            <span>
+                                {record.date.format('DD.MM.YYYY HH:mm')}
+                            </span>
+                            );
+                        },
+        },
+        {
+        title: 'Default Template',
+        dataIndex: 'defaultPeriodName',
+        sorter: (a, b) => a.periodDuration - b.periodDuration,
+        render: (_, record) => {
+                    const editable = isEditing(record);
+                    return editable ? (
+                        <span>
+                            <Form.Item name="defaultPeriodName">
+                                <Cascader options={periods}/>
+                            </Form.Item>
+                        </span>
+                    ) : (
+                        <span>
+                            {record.defaultPeriodName}
+                        </span>
+                        );
+                    },
         },
         {
             title: t('edit'),
