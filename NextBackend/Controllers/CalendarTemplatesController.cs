@@ -20,14 +20,14 @@ namespace NextBackend.Controllers
         [HttpGet]
         public IEnumerable<CalendarTemplateTransfer> Read() //TODO Антоша, солнышко, я тут херни натворил, нужно подпроавить =*
         {
-            var stateList = _dbContext.CalendarStates.ToList();
+            var stateList = _dbContext.CalendarStates.ToDictionary(el => el.Guid);
             var data = _dbContext.CalendarTemplates
                 .Select(el => new CalendarTemplateTransfer()
                 {
                     guid = el.Guid,
                     name = el.Name,
                     defaultStateGuid = el.DefaultStateGuid, 
-                    defaultStateName = stateList.Where(state => state.Guid == el.DefaultStateGuid).Single().Name,
+                    defaultStateName = stateList[el.DefaultStateGuid].Name,
                     periodDuration = el.PeriodDuration,
                     referenceDate = el.ReferenceDate
                 }).ToList();
@@ -98,13 +98,14 @@ namespace NextBackend.Controllers
     }
 
     //TODO Антоша, солнышко, я тут херни натворил, нужно подпроавить =*
+    [Serializable]
     public class CalendarTemplateTransfer
     {
-        public Guid guid;
-        public string name;
-        public Guid defaultStateGuid;
-        public string defaultStateName;
-        public TimeSpan periodDuration;
-        public DateTimeOffset referenceDate;
+        public Guid guid { get; set; }
+        public string name { get; set; }
+        public Guid defaultStateGuid { get; set; }
+        public string defaultStateName { get; set; }
+        public TimeSpan periodDuration { get; set; }
+        public DateTimeOffset referenceDate { get; set; }
     }
 }

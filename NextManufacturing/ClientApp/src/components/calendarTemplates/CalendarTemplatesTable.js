@@ -168,13 +168,13 @@ const CalendarTemplatesTable = (originData) => {
                     const editable = isEditing(record);
                     return editable ? (
                         <span>
-                            <Form.Item name="defaultPeriodName">
+                            <Form.Item name="defaultStateName">
                                 <Cascader options={periods}/>
                             </Form.Item>
                         </span>
                     ) : (
                         <span>
-                            {record.defaultPeriodName}
+                            {record.defaultStateName}
                         </span>
                         );
                     },
