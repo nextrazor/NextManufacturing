@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using NextBackend.DAL;
+using System.Linq;
 
 namespace NextBackend.Controllers
 {

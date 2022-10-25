@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace NextBackend.DAL
 {
@@ -27,6 +28,7 @@ namespace NextBackend.DAL
         /// Состояние применяется для всех дипазонов шаблона, для которых состояние не указано явно через CalendarTemplateSpan
         /// Значение null не считается корректным. В коде оставлен nullable-тип, потому что нельзя задать default-значение, гарантирующее ссылочную целостность
         /// </remarks>
+        [JsonIgnore]
         public CalendarState? DefaultState { get; set; }
         /// <summary>
         /// Guid состояния шаблона по умолчанию
@@ -46,6 +48,7 @@ namespace NextBackend.DAL
         /// <summary>
         /// Диапазоны в шаблоне календаря
         /// </summary>
+        [JsonIgnore]
         public List<CalendarTemplateSpan> Spans {get; set; } = new List<CalendarTemplateSpan>();
     }
 }
