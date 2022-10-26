@@ -1,8 +1,6 @@
-import {Form, Input, InputNumber, Popconfirm, Cascader, DatePicker, Table, Typography, Button, message} from 'antd';
+import {Form, Input, InputNumber, Popconfirm, Table, Typography, Modal, Button, message, DatePicker} from 'antd';
 import React, {useState} from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import {eventEmitter} from '../../systems/Events.ts'
-import { useNavigate } from "react-router-dom";
 
 const EditableCell = ({
                           editing,
@@ -33,32 +31,51 @@ const EditableCell = ({
     );
 };
 
-const CalendarTemplatesTable = (originData) => {
+const CalendarTemplatesEditorTable = (originData) => {
     const [form] = Form.useForm();
     const [modalForm] = Form.useForm();
-    const [data, setData] = useState(originData.originData.templates);
-    const [periods, setPeriods] = useState(originData.originData.periods);
+    const [data, setData] = useState(originData.originData);
     const [editingKey, setEditingKey] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const isEditing = (record) => record.key === editingKey;
-    const { t } = useTranslation('calendarTemplatesTable');
-    const navigate = useNavigate();
+    const { t } = useTranslation('calendarTemplatesEditorTable');
 
-    eventEmitter.subscribe('updateData_CT', (event) => addItem(event));
-
-    const addItem = (item) =>{
-        item.key = item.guid;
-        const newData = [...data];
-        newData.push(item);
-        setData(newData);
-    }
-
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
 
     const logErrorFromResponse = (response) => {
         response.json().then(parsedResponse => {
+            console.log(parsedResponse);
             error(t('messages.error') + parsedResponse.error);
         })
     }
+
+    const handleOk = async () => {
+        const row = await modalForm.validateFields();
+        if (row.name && row.name != undefined && row.name != '') {
+            fetch(`https://localhost:7167/Resources/CreateResource/${row.name}`, {method: 'POST'}).then(response => {
+                if (response.ok) {
+                    response.json().then(parsedResponse => {
+                        parsedResponse.key = parsedResponse.guid;
+                        const newData = [...data];
+                        newData.push(parsedResponse);
+                        setData(newData);
+                        modalForm.resetFields();
+                        setIsModalOpen(false);
+                        success(t('messages.addSuccess'));
+                    });
+                } else
+                    logErrorFromResponse(response);
+            });
+        } else
+            error(t('messages.noNameError'));
+    };
+
+    const handleCancel = async () => {
+        modalForm.resetFields();
+        setIsModalOpen(false);
+    };
 
     const edit = (record) => {
         form.setFieldsValue({
@@ -80,7 +97,7 @@ const CalendarTemplatesTable = (originData) => {
             const index = newData.findIndex((item) => key === item.key);
 
             if (index > -1) {
-                fetch(`https://localhost:7167/CalendarTemplates/DeleteCalendarTemplates/${key}`, {method: 'DELETE'}).then(response => {
+                fetch(`https://localhost:7167/Resources/DeleteResource/${key}`, {method: 'DELETE'}).then(response => {
                     if (response.ok) {
                         newData.splice(index, 1);
                         setData(newData);
@@ -103,8 +120,13 @@ const CalendarTemplatesTable = (originData) => {
             const newData = [...data];
             const index = newData.findIndex((item) => key === item.key);
 
+            var commandBuff = '';
+            for(var name in row) {
+                commandBuff += '/' + row[name];
+            }
+
             if (index > -1) {
-                var response = await fetch(`https://localhost:7167/CalendarTemplates/UpdateCalendarTemplates/${key}/${row.name}`, {method: 'POST'})
+                var response = await fetch(`https://localhost:7167/Resources/UpdateResource/${key}` + commandBuff, {method: 'POST'})
 
                 if (response.ok) {
                     const item = newData[index];
@@ -127,57 +149,50 @@ const CalendarTemplatesTable = (originData) => {
         {
             title: 'GUID',
             dataIndex: 'guid',
-            width: '30%',
         },
         {
-            title: 'Name',
-            dataIndex: 'name',
-            sorter: (a, b) => a.name.length - b.name.length,
-            editable: true,
-        },
-        {
-            title: 'Length',
-            dataIndex: 'periodDuration',
-            sorter: (a, b) => a.periodDuration - b.periodDuration,
-            editable: true,
-        },
-        {
-            title: 'Date',
-            dataIndex: 'date',
-            sorter: (a, b) => a.periodDuration - b.periodDuration,
-            render: (_, record) => {
-                        const editable = isEditing(record);
-            return editable ? (
-                            <span>
-                                <Form.Item name="date">
-                                    <DatePicker showTime format='DD.MM.YYYY HH:mm' />
-                                </Form.Item>
-                            </span>
-                        ) : (
-                            <span>
-                                {record.date.format('DD.MM.YYYY HH:mm')}
-                            </span>
-                            );
-                        },
-        },
-        {
-        title: 'Default Template',
-        dataIndex: 'defaultPeriodName',
+        title: 'From',
+        dataIndex: 'datetimeTo',
         sorter: (a, b) => a.periodDuration - b.periodDuration,
         render: (_, record) => {
                     const editable = isEditing(record);
-                    return editable ? (
+        return editable ? (
                         <span>
-                            <Form.Item name="defaultStateName">
-                                <Cascader options={periods}/>
+                            <Form.Item name="dateFrom">
+                                <DatePicker showTime format='DD.MM.YYYY HH:mm' />
                             </Form.Item>
                         </span>
                     ) : (
                         <span>
-                            {record.defaultStateName}
+                            {record.dateFrom.format('DD.MM.YYYY HH:mm')}
                         </span>
                         );
                     },
+        },
+        {
+        title: 'To',
+        dataIndex: 'datetimeTo',
+        sorter: (a, b) => a.periodDuration - b.periodDuration,
+        render: (_, record) => {
+                    const editable = isEditing(record);
+        return editable ? (
+                        <span>
+                            <Form.Item name="dateTo">
+                                <DatePicker showTime format='DD.MM.YYYY HH:mm' />
+                            </Form.Item>
+                        </span>
+                    ) : (
+                        <span>
+                            {record.dateTo.format('DD.MM.YYYY HH:mm')}
+                        </span>
+                        );
+                    },
+        },
+        {
+            title: 'Name',
+            dataIndex: 'stateName',
+            sorter: (a, b) => a.name.length - b.name.length,
+            editable: true,
         },
         {
             title: t('edit'),
@@ -206,21 +221,6 @@ const CalendarTemplatesTable = (originData) => {
         </span>
                 );
             },
-        },
-        {
-            title: t('configure'),
-            dataIndex: 'operation3',
-            render: (_, record) => {
-                return(
-                <span>
-                    <Typography.Link disabled={editingKey !== ''} onClick={() => { 
-                        //let options = { state: {templateToEdit:record.key} };
-                        navigate('/fetch-calendar-templates-editor/' + record.key);//, options
-                        //navigate({to:'/fetch-calendar-templates-editor', options: { state: {template:record.key}}}) 
-                    }}>
-                        {t('configure')}
-                    </Typography.Link>
-                </span>)}
         },
         {
             title: t('delete'),
@@ -263,7 +263,9 @@ const CalendarTemplatesTable = (originData) => {
     });
     return (
         <span>
-    
+    <Button type="primary" onClick={showModal} style={{marginBottom: "15px", float: 'right'}}>
+      {t('new')}
+    </Button>
     <Form form={form} component={false}>
       <Table
           components={{
@@ -280,8 +282,15 @@ const CalendarTemplatesTable = (originData) => {
           }}
       />
     </Form>
+    <Modal title={t('new')} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+      <Form form={modalForm} component={false}>
+        <Form.Item label={t('name')} name="name">
+          <Input onPressEnter={handleOk}/>
+        </Form.Item>
+      </Form>
+    </Modal>
   </span>
     );
 };
 
-export default CalendarTemplatesTable;
+export default CalendarTemplatesEditorTable;

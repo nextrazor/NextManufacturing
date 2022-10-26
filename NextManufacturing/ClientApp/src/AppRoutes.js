@@ -2,7 +2,7 @@ import ApiAuthorzationRoutes from './components/api-authorization/ApiAuthorizati
 import { Counter } from "./components/Counter";
 import { FetchData } from "./components/FetchData";
 import { default as FetchResources } from "./components/resources/FetchResources";
-import { default as FetchCalendarPeriods } from "./components/calendarPeriods/FetchCalendarPeriods"
+import { default as FetchCalendarStates } from "./components/calendarStates/FetchCalendarStates"
 import { default as FetchCalendarTemplates } from "./components/calendarTemplates/FetchCalendarTemplates"
 import { Home } from "./components/Home";
 
@@ -25,8 +25,8 @@ const AppRoutes = [
     element: <FetchResources />
   },
   {
-    path: '/fetch-calendar-periods',
-    element: <FetchCalendarPeriods />
+    path: '/fetch-calendar-states',
+    element: <FetchCalendarStates />
   },
   {
     path: '/fetch-calendar-templates',

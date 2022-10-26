@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {Form, Input, InputNumber, Popconfirm, Table, Typography} from 'antd';
 import {withTranslation} from 'react-i18next';
-import CalendarPeriodsTable from './CalendarPeriodsTable'
+import CalendarStatesTable from './CalendarStatesTable'
 
-class FetchCalendarPeriods extends Component {
-    static displayName = FetchCalendarPeriods.name;
+class FetchCalendarStates extends Component {
+    static displayName = FetchCalendarStates.name;
 
     constructor(props) {
         super(props);
@@ -24,7 +24,7 @@ class FetchCalendarPeriods extends Component {
         const {t} = this.props;
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : <CalendarPeriodsTable originData={this.state.data}/>;
+            : <CalendarStatesTable originData={this.state.data}/>;
 
         return (
             <div>
@@ -42,4 +42,4 @@ class FetchCalendarPeriods extends Component {
     }
 }
 
-export default withTranslation('calendarPeriods')(FetchCalendarPeriods);
+export default withTranslation('calendarStates')(FetchCalendarStates);

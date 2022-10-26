@@ -29,12 +29,16 @@
     <ItemGroup>
         <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
         <None Include="ClientApp\public\locales\en\calendarPeriods.json" />
+        <None Include="ClientApp\public\locales\en\calendarStates.json" />
+        <None Include="ClientApp\public\locales\en\calendarTemplatesEditor.json" />
+        <None Include="ClientApp\public\locales\en\calendarTemplatesEditorTable.json" />
         <None Include="ClientApp\public\locales\en\resourcesTable.json" />
     </ItemGroup>
     <ItemGroup>
         <!-- Don't publish the SPA source files, but do show them in the project files list -->
         <Content Remove="$(SpaRoot)**" />
         <Content Include="ClientApp\public\locales\en\calendarPeriodsTable.json" />
+        <Content Include="ClientApp\public\locales\en\calendarStatesTable.json" />
         <Content Include="ClientApp\public\locales\en\menu.json" />
         <None Remove="$(SpaRoot)**" />
         <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />

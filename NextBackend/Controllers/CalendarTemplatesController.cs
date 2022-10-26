@@ -18,7 +18,7 @@ namespace NextBackend.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<CalendarTemplateTransfer> Read() //TODO Антоша, солнышко, я тут херни натворил, нужно подпроавить =*
+        public IEnumerable<CalendarTemplateTransfer> Read()
         {
             var stateList = _dbContext.CalendarStates.ToDictionary(el => el.Guid);
             var data = _dbContext.CalendarTemplates
@@ -33,7 +33,25 @@ namespace NextBackend.Controllers
                 }).ToList();
             return data;
         }
-
+        
+        [HttpGet]
+        [Route("GetByGuid/{guid}")]
+        public IEnumerable<CalendarTemplateTransfer> Read(Guid guid)
+        {
+            var stateList = _dbContext.CalendarStates.ToDictionary(el => el.Guid);
+            var data = _dbContext.CalendarTemplates
+                .Where(el => el.Guid == guid).Select(el => new CalendarTemplateTransfer()
+                {
+                    guid = el.Guid,
+                    name = el.Name,
+                    defaultStateGuid = el.DefaultStateGuid, 
+                    defaultStateName = stateList[el.DefaultStateGuid].Name,
+                    periodDuration = el.PeriodDuration,
+                    referenceDate = el.ReferenceDate
+                }).ToList();
+            return data;
+        }
+        
         [HttpPost]
         [Route("CreateCalendarTemplate/{name}/{defaultStateGuid:guid}/{periodDuration:double}/{referenceDate:datetime}")]
         public async Task<CalendarTemplate> Create(string name, Guid defaultStateGuid, double periodDuration, DateTime referenceDate)
@@ -97,7 +115,6 @@ namespace NextBackend.Controllers
         }
     }
 
-    //TODO Антоша, солнышко, я тут херни натворил, нужно подпроавить =*
     [Serializable]
     public class CalendarTemplateTransfer
     {

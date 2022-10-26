@@ -31,14 +31,14 @@ const EditableCell = ({
     );
 };
 
-const CalendarPeriodsTable = (originData) => {
+const CalendarStatesTable = (originData) => {
     const [form] = Form.useForm();
     const [modalForm] = Form.useForm();
     const [data, setData] = useState(originData.originData);
     const [editingKey, setEditingKey] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const isEditing = (record) => record.key === editingKey;
-    const { t } = useTranslation('calendarPeriodsTable');
+    const { t } = useTranslation('calendarStatesTable');
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -251,4 +251,4 @@ const CalendarPeriodsTable = (originData) => {
     );
 };
 
-export default CalendarPeriodsTable;
+export default CalendarStatesTable;

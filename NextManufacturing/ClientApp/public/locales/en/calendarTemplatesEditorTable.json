@@ -1,0 +1,19 @@
+{
+  "new": "New Span",
+  "edit": "Edit",
+  "delete": "Delete",
+  "name": "Name",
+  "ok": "OK",
+  "cansel": "Cancel",
+  "confirmCancel": "Sure to cancel?",
+  "confirmDelete": "Sure to delete?",
+  "messages": {
+    "addSuccess": "Item added successfully",
+    "noNameError": "No resource name entered!",
+    "error": "Error ",
+    "deleteSuccess": "Deleted successfully",
+    "noDeleteItem": "Not found entity to delete",
+    "updateSuccess": "Updated successfully",
+    "noUpdateItem": "No entity to update"
+  }
+}

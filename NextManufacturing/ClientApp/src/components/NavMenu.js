@@ -61,9 +61,9 @@ export const NavMenu = () => {
                       label: t('resources'),
                     },
                     {
-                      key: '/fetch-calendar-periods',
+                      key: '/fetch-calendar-states',
                       icon: <DownloadOutlined />,
-                      label: t('calendarPeriods'),
+                      label: t('calendarStates'),
                     },
                     {
                       key: '/fetch-calendar-templates',

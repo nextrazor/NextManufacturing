@@ -1,43 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import { Bar } from '@ant-design/plots';
 
-const DemoBar = () => {
-  const data = [
-    {
-      year: '1991',
-      value: 1,
-      type: 'работа',
-      colorText: 'red'
-    },
-    {
-      year: '1991',
-      value: 2,
-      type: 'простой',
-      colorText: 'green'
-    },
-    {
-      year: '1991',
-      value: 3,
-      type: 'работа2',
-      colorText: 'red'
-    },
-    {
-      year: '1991',
-      value: 5,
-      type: 'работа3',
-      colorText: 'green'
-    },
-    
-  ];
+const CalendarTemplatesEditorPlot = (originData) => {
+  
   const config = {
-    data: data.reverse(),
+    data: originData.originData.reverse(),
     isStack: true,
     xField: 'value',
     yField: 'year',
     seriesField: 'type',
     color: ({ type }) => {
-    if(type.includes('работа')){
+    if(type.includes('Работа')){
         return '#597ef7';
       }
       return '#ffc069';
@@ -61,7 +34,8 @@ const DemoBar = () => {
       ],
     },
   };
+  
   return <Bar {...config} />;
 };
 
-ReactDOM.render(<DemoBar />, document.getElementById('container'));
+export default CalendarTemplatesEditorPlot;

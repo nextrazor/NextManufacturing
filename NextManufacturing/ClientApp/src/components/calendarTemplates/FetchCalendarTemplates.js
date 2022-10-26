@@ -16,6 +16,7 @@ class FetchCalendarTemplates extends Component {
 
     componentDidMount() {
         this.populateData();
+        console.log(this.props.params);
     }
 
     onChange = (pagination, filters, sorter, extra) => {
