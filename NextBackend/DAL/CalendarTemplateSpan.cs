@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace NextBackend.DAL
 {
@@ -17,6 +18,7 @@ namespace NextBackend.DAL
         /// <summary>
         /// Шаблон календаря
         /// </summary>
+        [JsonIgnore]
         public CalendarTemplate CalendarTemplate { get; set; } = null!;
         /// <summary>
         /// Guid шаблона календаря
@@ -36,6 +38,7 @@ namespace NextBackend.DAL
         /// <summary>
         /// Календарное состояние в заданном диапазоне
         /// </summary>
+        [JsonIgnore]
         public CalendarState State { get; set; } = null!;
         /// <summary>
         /// Guid календарного состояния в заданном диапазоне
